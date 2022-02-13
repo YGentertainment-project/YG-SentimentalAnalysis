@@ -39,6 +39,9 @@ VENDOR_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+]
+
+LOCAL_APPS = [
     'account',
     'clipping',
     'config',
@@ -46,10 +49,6 @@ VENDOR_APPS = [
     'report',
     'corsheaders',
     'utils'
-]
-
-LOCAL_APPS = [
-
 ]
 
 INSTALLED_APPS = VENDOR_APPS + LOCAL_APPS
