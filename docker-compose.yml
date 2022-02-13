@@ -1,0 +1,43 @@
+version: "3.8"
+
+services:
+    yg-mariadb:
+        image: mariadb:10.7.1
+        container_name: yg-mariadb
+        restart: always
+        volumes:
+            - ./db/data/maria:/var/lib/mysql
+        environment:
+            - MYSQL_HOST=ygenter
+            - MYSQL_PORT=3306
+            - MYSQL_ROOT_PASSWORD=ygenter
+            - MYSQL_DATABASE=ygenter2
+            - MYSQL_USER=ygenter
+            - MYSQL_PASSWORD=ygenter
+        
+    yg-mongodb:
+        image: mongo:5.0.5
+        container_name: yg-mongodb
+        restart: always
+        volumes:
+            - ./db/data/mongo:/data/db
+        environment:
+            - MONGO_INITDB_ROOT_USERNAME=ygenter
+            - MONGO_INITDB_ROOT_PASSWORD=ygenter
+            - MONGO_INITDB_DATABASE=ygenter
+            - MONGO_PORT=27017
+
+    yg-sentimental-analysis:
+        image: sentimental-analysis
+        container_name: yg-sentimental-analysis
+        deploy:
+            resources:
+                reservations:
+                    devices:
+                        - capabilities: [gpu]
+        restart: always
+        depends_on:
+            - yg-mariadb
+            - yg-mongodb          
+        ports:
+            - "0.0.0.0:80:8000"
