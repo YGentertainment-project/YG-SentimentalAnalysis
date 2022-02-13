@@ -1,30 +1,35 @@
 class Router(object):
     def __init__(self):
-        self.model_list = ["default", "mongo"]
+        self.mongo_list = ["crawler"]
     
     def db_for_read(self, model, **hints):
-        if model._meta.app_label == "default":
-            return "default"
-        elif model._meta.app_label == "mongo":
+        if model._meta.app_label in self.mongo_list:
             return "mongo"
-        return None
+        else:
+            return "default"
     
     def db_for_write(self, model, **hints):
-        if model._meta.app_label == "default":
-            return "default"
-        elif model._meta.app_label == "mongo":
+        if model._meta.app_label in self.mongo_list:
             return "mongo"
-        return None
+        else:
+            return "default"
     
     def allow_relation(self, obj1, obj2, **hints):
-        if obj1._meta.app_label == "default" or \
-            obj2._meta.app_label == "default":
+        if obj1._meta.app_label not in self.mongo_list or \
+            obj2._meta.app_label not in self.mongo_list:
             return True
         return None
     
     def allow_migrate(self, db, app_label, model_name=None, **hints):
-        if app_label == "default":
-            return db == "default"
-        if app_label == "mongo":
-            return db == "mongo"
-        return True
+        if app_label in self.mongo_list:
+            if db == "mongo":
+                print("mongo_list [" + db + "] : " + app_label)
+                return True
+            else:
+                return False
+        else:
+            if db == "default":
+                print("else_list [" + db + "] : " + app_label)
+                return True
+            else:
+                return False
