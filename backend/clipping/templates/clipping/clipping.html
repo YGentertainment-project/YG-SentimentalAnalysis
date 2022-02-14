@@ -1,18 +1,43 @@
 <!DOCTYPE html>
-{% load static %}
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" href="{% static 'css/clipping.css' %}">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <title>clipping</title>
-</head>
-<body>
-    hello
+    {% load static %}
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="{% static 'css/clipping.css' %}">
+        <link rel="stylesheet" href="{% static 'css/volt.css' %}">
+        <link rel="stylesheet" href="{% static 'css/volt.css.map' %}">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <title>clipping</title>
+    </head>
+    <body>
+        <span class="test">NEWS 클리핑 그룹을 선택하세요</span>
+        <br>
+        <div class="row_layout">
+            {% if groups %}
+            {% for group in groups %}
+            <button class="btn border-0 border-btn">
+                {{group}}
+            </button>
+            {% endfor %}
+            {% else %}
+            {% endif %}
+            <span style="cursor: pointer; margin-right: 2px;">
+                <svg id="add-sub" width="25" height="25" viewBox="0 0 100 100">
+                    <g stroke = "black" stroke-width = "12" fill="none">
+                        <path d="M 25 50 L 75 50
+                                M 50 25 L 50 75
+                                M 50 5
+                                A 45 45 0 0 0 50 95
+                                A 45 45 0 1 0 5 50" />
+                    </g>
+                </svg>
+            </span>
+        </div>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script src="{% static 'js/clipping.js' %}"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-</body>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="{% static 'js/clipping.js' %}"></script>
+    </body>
 </html>
+
+
