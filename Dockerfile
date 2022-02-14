@@ -1,4 +1,4 @@
-FROM tensorflow/tensorflow:2.7.0-gpu-jupyter
+FROM pytorch/pytorch:1.10.0-cuda11.3-cudnn8-runtime
 
 WORKDIR /app
 
