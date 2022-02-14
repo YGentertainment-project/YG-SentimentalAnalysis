@@ -17,7 +17,7 @@ DATABASES = {
         "PASSWORD": "ygenter",
     },
     "mongo":{
-        "ENGINE": "django",
+        "ENGINE": "djongo",
         # "ENFORCE_SCHEMA": True,
         "NAME": "ygenter",
         "CLIENT": {
