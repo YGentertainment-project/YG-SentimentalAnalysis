@@ -28,7 +28,7 @@ with open(os.path.join(DATA_DIR, "config", "secret.key"), "r") as f:
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 # Application definition
 
@@ -117,16 +117,14 @@ USE_TZ = True  # 데이터베이스 저장 시에도 현재시간(Asia/Seoul)대
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
-# STATIC_URL = '/public/'
-# STATIC_ROOT = os.path.join(BASE_DIR,'staticfiles')
 # STATICFILES_DIRS = [BASE_DIR/"public",]
 
 STATIC_URL = '/static/'
-# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# STATICFILES_DIRS = [
-#     os.path.join(BASE_DIR, 'static')
-# ]
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static')
+]
 
 # # Rabbitmq env_values
 # RABBITMQ_HOSTS = os.environ.get('RABBITMQ_HOST', 'localhost')

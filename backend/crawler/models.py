@@ -1,5 +1,5 @@
 from django.db import models
-from djongo import models as dmodels
+from django.db import models as dmodels
 
 class db_test1(models.Model):
     artist = models.CharField(max_length=100)  # 아티스트 이름
