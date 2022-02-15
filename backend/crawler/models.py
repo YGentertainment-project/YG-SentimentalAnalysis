@@ -1,19 +1,67 @@
 from django.db import models
-from django.db import models as dmodels
+from djongo import models as dmodels
 
-class db_test1(models.Model):
-    artist = models.CharField(max_length=100)  # 아티스트 이름
-    monthly_listens = models.BigIntegerField(null=True)
-    followers = models.BigIntegerField(null=True)
-    recorded_date = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateField(null=True)
-    url1 = models.TextField(null=True)
-    url2 = models.TextField(null=True)
-    class Meta:
-        db_table = "test1"
 
-class db_test2(dmodels.Model):
-    first_name = dmodels.CharField(max_length=30)
-    last_name = dmodels.CharField(max_length=30)
-    class Meta:
-        db_table = "test2"
+# target은 spider의 이름으로 대체
+
+class Youtube(dmodels.Model):
+    data_id = dmodels.TextField(null=False)  # primary
+    title = dmodels.CharField(max_length=255, null=True)
+    desc = dmodels.TextField(null=True)
+    view = dmodels.IntegerField(null=True)
+    subs = dmodels.IntegerField(null=True)
+    video = dmodels.IntegerField(null=True)
+    channelId = dmodels.TextField(null=True)
+    create_dt = dmodels.DateTimeField(null=True)
+    like = dmodels.IntegerField(null=True)
+    videoId = dmodels.TextField(null=True)
+    body = dmodels.TextField(null=True)
+
+
+class News(dmodels.Model):
+    data_id = dmodels.IntegerField(null=False)
+    press = dmodels.CharField(max_length=100, null=False)
+    reporter = dmodels.CharField(max_length=100, null=True)
+    title = dmodels.CharField(max_length=255, null=False)
+    body = dmodels.TextField(null=False)
+    snippet = dmodels.CharField(max_length=100, null=False)
+    create_dt = dmodels.DateTimeField(null=False)
+    url = dmodels.TextField(null=False)
+    keyword = dmodels.CharField(max_length=100, null=False)
+    reaction = dmodels.JSONField()
+
+
+class IG(dmodels.Model):
+    data_id = dmodels.IntegerField(null=True)
+    channel = dmodels.CharField(max_length=255, null=False)
+    post_url = dmodels.TextField(null=False)
+    post_type = dmodels.CharField(max_length=100, null=False)
+    create_dt = dmodels.DateTimeField(null=False)
+    body = dmodels.TextField(null=False)
+    stat = dmodels.JSONField()
+    by = dmodels.CharField(max_length=100, null=False)
+
+
+class FB(dmodels.Model):
+    data_id = dmodels.IntegerField(null=True)
+    channel = dmodels.CharField(max_length=255, null=False)
+    post_url = dmodels.TextField(null=False)
+    create_dt = dmodels.DateTimeField(null=False)
+    body = dmodels.TextField(null=False)
+    stat = dmodels.JSONField()
+    by = dmodels.CharField(max_length=100, null=False)
+
+
+class Twitter(dmodels.Model):
+    data_id = dmodels.IntegerField(null=True)
+    create_dt = dmodels.DateTimeField(null=False)
+    body = dmodels.TextField(null=False)
+    user_id = dmodels.CharField(max_length=100, null=False)
+    username = dmodels.CharField(max_length=100, null=False)
+    name = dmodels.CharField(max_length=100, null=False)
+    lang = dmodels.CharField(max_length=100, null=False)
+    keyword = dmodels.CharField(max_length=100, null=False)
+    geo = dmodels.CharField(max_length=100, null=False)
+    hashtags = dmodels.CharField(max_length=100, null=False)
+    object_id = dmodels.CharField(max_length=100, null=False)
+    channel = dmodels.CharField(max_length=100, null=False)
