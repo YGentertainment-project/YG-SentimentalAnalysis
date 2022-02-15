@@ -9,4 +9,6 @@ transformers>=2.10.0
 seqeval>=0.0.12
 sentencepiece>=0.1.96
 konlpy>=0.6.0
+soyspacing>=1.0.0
 git+git://github.com/himanshudabas/twint.git@master
+git+git://github.com/ssut/py-hanspell.git
