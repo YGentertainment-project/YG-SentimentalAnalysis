@@ -2,19 +2,15 @@ FROM pytorch/pytorch:1.10.0-cuda11.3-cudnn8-runtime
 
 WORKDIR /app
 
-COPY requirements.txt /app/
+ADD ./backend /app
 
 RUN apt-get update \
-    && apt-get install -y wget \
-    fonts-liberation libasound2 libatk-bridge2.0-0 libcairo2 libcups2 libdrm2 libgbm1 libgtk-3-0 libnspr4 libnss3 libpango-1.0-0\
-    libxcomposite1 libxdamage1 libxfixes3 libxkbcommon0 libxrandr2 xdg-utils \
+    && apt-get install -y wget git\
     && wget http://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_97.0.4692.71-1_amd64.deb
 
-RUN dpkg -i ./google-chrome-stable_97.0.4692.71-1_amd64.deb \
-    && apt-get install -f
+RUN apt install -y ./google-chrome-stable_97.0.4692.71-1_amd64.deb \
+    && apt-get -f install
 
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r /app/deploy/requirements.txt
 
 EXPOSE 8000
-
-COPY ./web /app/
