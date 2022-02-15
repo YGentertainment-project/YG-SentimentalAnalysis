@@ -22,7 +22,7 @@ class MongoDBPipelines:
         self.db = connection[MONGO_DB]
         self.buffer = {}
     def process_item(self, item, spider):
-        if item.target not in self.buffer:
+        if spider.name not in self.buffer:
             self.buffer[spider.name] = []
         self.buffer[spider.name].append(dict(item))
         

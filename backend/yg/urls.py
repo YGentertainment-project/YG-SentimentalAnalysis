@@ -24,3 +24,4 @@ urlpatterns = [
     path("crawler/", include("crawler.urls")),
     path("report/", include("report.urls"))
 ]
+
