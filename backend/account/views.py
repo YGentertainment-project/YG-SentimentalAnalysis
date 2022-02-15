@@ -10,8 +10,6 @@ from utils.decorators import login_required
 from .models import User
 from .serializers import *
 
-# "/"로 접속시 사이트 시작화면
-
 
 def base(request):
     return render(request, 'account/main.html')

@@ -5,4 +5,11 @@ def base(request):
     '''
     general page
     '''
-    return render(request, 'clipping/clipping.html')
+    # db연결 필요
+    values = {
+        'groups': ['그룹1', '그룹2'],
+        'keywords': ['키워드1', '키워드2', '키워드2', '키워드2', '키워드2', '키워드2', '키워드2', '키워드2', '키워드2', '키워드2'
+        , '키워드2', '키워드2', '키워드2', '키워드2', '키워드2', '키워드2', '키워드2', '키워드2'
+        , '키워드2', '키워드2', '키워드2', '키워드2', '키워드2', '키워드2', '키워드2', '키워드냠냠'],
+    }
+    return render(request, 'clipping/clipping.html', values)

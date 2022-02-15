@@ -1,18 +1,207 @@
 <!DOCTYPE html>
-{% load static %}
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" href="{% static 'css/clipping.css' %}">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <title>clipping</title>
-</head>
-<body>
-    hello
+    {% load static %}
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="{% static 'css/clipping.css' %}">
+        <link rel="stylesheet" href="{% static 'css/volt.css' %}">
+        <link rel="stylesheet" href="{% static 'css/volt.css.map' %}">
+        <!-- GOOGLE FONTS LINK -->
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family= Titillium+Web:wght@700&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Do+Hyeon&display=swap" rel="stylesheet"> 
+        <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic&display=swap" rel="stylesheet">
+    
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script src="{% static 'js/clipping.js' %}"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-</body>
+        <title>clipping</title>
+    </head>
+    <body>
+        <span class="subtitle" style="padding-left: 10px;">NEWS 클리핑 그룹을 선택하세요</span>
+        <div class="row_layout child-margin-5" style="padding-left: 10px;">
+            {% if groups %}
+            {% for group in groups %}
+            <button class="border-btn">
+                {{group}}
+            </button>
+            {% endfor %}
+            {% else %}
+            {% endif %}
+            <span style="cursor: pointer; margin-right: 2px;">
+                <svg id="add-sub" width="25" height="25" viewBox="0 0 100 100">
+                    <g stroke = "black" stroke-width = "12" fill="none">
+                        <path d="M 25 50 L 75 50
+                                M 50 25 L 50 75
+                                M 50 5
+                                A 45 45 0 0 0 50 95
+                                A 45 45 0 1 0 5 50" />
+                    </g>
+                </svg>
+            </span>
+        </div>
+        
+        <div id="group_content" class="group_content">
+            <div>
+                <span class="subtitle">키워드를 선택하세요 (최대 N개)</span>
+                <div class="keyword-board child-margin-5">
+                    {% if keywords %}
+                    {% for keyword in keywords %}
+                    <button class="keyword-btn">
+                        {{keyword}}
+                    </button>
+                    {% endfor %}
+                    {% else %}
+                    {% endif %}
+                </div>
+            </div>
+    
+            <div>
+                <span class="subtitle" style="margin-top: 5px;">수신인 설정</span>
+                <div class="row_layout child-margin-5">
+                    <button class="keyword-btn">엑셀 다운로드</button>
+                    <button class="keyword-btn">엑셀 업로드</button>
+                </div>
+            </div>
+    
+            <div>
+                <span class="subtitle">뉴스 수집 기간</span>
+                <div class="row_layout child-margin-5">
+                    <button class="keyword-btn">당일</button>
+                    <button class="keyword-btn">어제</button>
+                    <button class="keyword-btn">1주</button>
+                    <button class="keyword-btn">1달</button>
+                </div>
+            </div>
+    
+            <div>
+                <span class="subtitle">메일 발송 설정</span>
+                <table class="table table-centered table-nowrap mb-0 rounded" style="width: 40%;">
+                    <thead class="thead-dark" style="text-align: center !important;
+                    font-weight: bold;">
+                        <tr>
+                            <td class="border-0 rounded-start">횟수</td>
+                            <td class="border-0 rounded-end"  style="width:260px;">내용</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1차</td>
+                            <td>
+                                <div class="row_layout">
+                                    <div style="width:130px;">
+                                        <select style="margin:2px;" name="hour" id="hour-select" class="form-select">
+                                            <option value="0">00</option>
+                                            <option value="1">01</option>
+                                            <option value="2">02</option>
+                                            <option value="3">03</option>
+                                            <option value="4">04</option>
+                                            <option value="5">05</option>
+                                            <option value="6">06</option>
+                                            <option value="7">07</option>
+                                            <option value="8">08</option>
+                                            <option value="9">09</option>
+                                            <option value="10">10</option>
+                                            <option value="11">11</option>
+                                            <option value="12">12</option>
+                                            <option value="13">13</option>
+                                            <option value="14">14</option>
+                                            <option value="15">15</option>
+                                            <option value="16">16</option>
+                                            <option value="17">17</option>
+                                            <option value="18">18</option>
+                                            <option value="19">19</option>
+                                            <option value="20">20</option>
+                                            <option value="21">21</option>
+                                            <option value="22">22</option>
+                                            <option value="23">23</option>
+                                        </select>
+                                    </div>
+                                    <span style="margin-top: 5px; margin-right: 10px;">시</span>
+                                    <div style="width:130px;">
+                                        <select style="margin:2px;" name="minute" id="minute-select" class="form-select">
+                                            <option value="0">00</option>
+                                            <option value="1">01</option>
+                                            <option value="2">02</option>
+                                            <option value="3">03</option>
+                                            <option value="4">04</option>
+                                            <option value="5">05</option>
+                                            <option value="6">06</option>
+                                            <option value="7">07</option>
+                                            <option value="8">08</option>
+                                            <option value="9">09</option>
+                                            <option value="10">10</option>
+                                            <option value="11">11</option>
+                                            <option value="12">12</option>
+                                            <option value="13">13</option>
+                                            <option value="14">14</option>
+                                            <option value="15">15</option>
+                                            <option value="16">16</option>
+                                            <option value="17">17</option>
+                                            <option value="18">18</option>
+                                            <option value="19">19</option>
+                                            <option value="20">20</option>
+                                            <option value="21">21</option>
+                                            <option value="22">22</option>
+                                            <option value="23">23</option>
+                                            <option value="24">24</option>
+                                            <option value="25">25</option>
+                                            <option value="26">26</option>
+                                            <option value="27">27</option>
+                                            <option value="28">28</option>
+                                            <option value="29">29</option>
+                                            <option value="30">30</option>
+                                            <option value="31">31</option>
+                                            <option value="32">32</option>
+                                            <option value="33">33</option>
+                                            <option value="34">34</option>
+                                            <option value="35">35</option>
+                                            <option value="36">36</option>
+                                            <option value="37">37</option>
+                                            <option value="38">38</option>
+                                            <option value="39">39</option>
+                                            <option value="40">40</option>
+                                            <option value="41">41</option>
+                                            <option value="42">42</option>
+                                            <option value="43">43</option>
+                                            <option value="44">44</option>
+                                            <option value="45">45</option>
+                                            <option value="46">46</option>
+                                            <option value="47">47</option>
+                                            <option value="48">48</option>
+                                            <option value="49">49</option>
+                                            <option value="50">50</option>
+                                            <option value="51">51</option>
+                                            <option value="52">52</option>
+                                            <option value="53">53</option>
+                                            <option value="54">54</option>
+                                            <option value="55">55</option>
+                                            <option value="56">56</option>
+                                            <option value="57">57</option>
+                                            <option value="58">58</option>
+                                            <option value="59">59</option>
+                                        </select>
+                                    </div>
+                                    <span style="margin-top: 5px;">분</span>
+
+
+                                </div>
+
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+    
+            <button class="btn btn-primary border-0">미리보기</button>
+        </div>
+
+
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="{% static 'js/clipping.js' %}"></script>
+    </body>
 </html>
+
+
