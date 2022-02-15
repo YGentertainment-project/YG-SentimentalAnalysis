@@ -29,3 +29,4 @@ backend/data/test_case/*
 
 # DB backup
 *.sql
+apikey.py

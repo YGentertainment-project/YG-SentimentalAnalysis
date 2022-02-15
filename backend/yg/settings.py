@@ -47,7 +47,6 @@ LOCAL_APPS = [
     'config',
     'crawler',
     'report',
-    'corsheaders',
     'utils'
 ]
 
