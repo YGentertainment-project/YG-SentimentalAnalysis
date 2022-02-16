@@ -14,14 +14,12 @@ def base(request):
     # db연결 필요
     groups = Group.objects.all()
     keywords = KeywordGroup.objects.all()
-    print(groups)
     print(keywords)
     values = {
-        'groups': ['그룹1', '그룹2'],
+        'groups': groups,
         'keywords': ['키워드1', '키워드2', '키워드3', '키워드4', '키워드5', '키워드6', '키워드7', '키워드8', '키워드9', '키워드10'
         , '키워드11', '키워드12', '키워드13', '키워드14', '키워드15', '키워드16', '키워드17', '키워드18'
         , '키워드19', '키워드20', '키워드21', '키워드22', '키워드23', '키워드24', '키워드25', '키워드26'],
-
         'first_depth' : 'NEWS 클리핑',
         'second_depth': 'NEWS 클리핑',
     }

@@ -114,9 +114,9 @@ function getKeywordOfGroup(group_name){
         },
         error: e => {
             console.log("=======error-------")
-            var result = JSON.parse(e.responseText);
-            if(result.data != null)
-                alert(result.data);
+            // var result = JSON.parse(e.responseText);
+            if(e.responseText["data"] != null)
+                alert(e.responseText["data"]);
             else
                 alert(e.responseText);
         },
@@ -374,9 +374,9 @@ $("#save-group").click(function(){
         },
         error: e => {
             console.log("=======error-------")
-            var result = JSON.parse(e.responseText);
-            if(result.data != null)
-                alert(result.data);
+            console.log(e.responseText);
+            if(e.responseText["data"] != null)
+                alert(e.responseText["data"]);
             else
                 alert(e.responseText);
         },
@@ -410,9 +410,9 @@ $("#save-group").click(function(){
                 // alert(e.responseText);
                 // location.reload();
                 console.log("=======error-------")
-                var result = JSON.parse(e.responseText);
-                if(result.data != null)
-                    alert(result.data);
+                // var result = JSON.parse(e.responseText);
+                if(e.responseText["data"] != null)
+                    alert(e.responseText["data"]);
                 else
                     alert(e.responseText);
             },
