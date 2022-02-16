@@ -113,7 +113,12 @@ function getKeywordOfGroup(group_name){
             }
         },
         error: e => {
-            alert(e.responseText);
+            console.log("=======error-------")
+            var result = JSON.parse(e.responseText);
+            if(result.data != null)
+                alert(result.data);
+            else
+                alert(e.responseText);
         },
     });
 }
@@ -364,11 +369,16 @@ $("#save-group").click(function(){
         datatype:'json',
         data: JSON.stringify(data),
         success: res => {
+            console.log("=======success-------");
             alert("저장되었습니다.");
         },
         error: e => {
-            console.log(e.responseText);
-            alert(e.responseText);
+            console.log("=======error-------")
+            var result = JSON.parse(e.responseText);
+            if(result.data != null)
+                alert(result.data);
+            else
+                alert(e.responseText);
         },
     })
  });
@@ -391,10 +401,20 @@ $("#save-group").click(function(){
             data: JSON.stringify(data),
             success: res => {
                 alert("삭제되었습니다.");
+                location.reload();
             },
             error: e => {
-                console.log(e.responseText);
-                alert(e.responseText);
+                // console.log(e.responseText);
+                // console.log(e.data);
+                // alert(e.data);
+                // alert(e.responseText);
+                // location.reload();
+                console.log("=======error-------")
+                var result = JSON.parse(e.responseText);
+                if(result.data != null)
+                    alert(result.data);
+                else
+                    alert(e.responseText);
             },
         })
     } 
