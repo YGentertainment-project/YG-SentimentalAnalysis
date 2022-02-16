@@ -484,10 +484,10 @@ class NLP_Engine:
                             prev_tag = False
                     if id2label[str(pred[s + 1])][-1] == 'I':
                         if prev_tag:
-                            tag_list[-1] += ' '
+                            tag_list[-1][0] += ' '
                         else:
-                            tag_list.append('')
-                        tag_list[-1] += tag_str
+                            tag_list.append(['', id2label[str(pred[s + 1])][:-2]])
+                        tag_list[-1][0] += tag_str
             return_list.append(tag_list)
             # print(' '.join([tokens[j] for j in range(s, e)]))
             # print(' '.join([id2label[str(preds[i][j + 1])] for j in range(s, e)]))
