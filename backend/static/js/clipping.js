@@ -33,6 +33,15 @@ function getTime(minutes, seconds) {
     });
     $('#groups').append(newButton);
     document.getElementById("add-group-form").style.display = "none";
+    if($(newButton).hasClass("clicked-group-btn")){
+        $(newButton).removeClass("clicked-group-btn");
+        $("#group_content").addClass("hide");
+    }else{
+        $(newButton).addClass("clicked-group-btn");
+        $(".group-btn").not($(newButton)).removeClass("clicked-group-btn"); 
+        $("#group_content").removeClass("hide");
+        getNewKeywordOfGroup();
+    }
  });
 
  $(".group-btn").click(function(){
@@ -76,10 +85,11 @@ function getKeywordOfGroup(group_name){
                 for(var i = 0; i < len; i++) {
                     if( keywords.includes($($('.keyword-btn')[i]).val()) ){
                         $($('.keyword-btn')[i]).addClass("clicked-keyword-btn");
+                    }else{
+                        $($('.keyword-btn')[i]).removeClass("clicked-keyword-btn");
                     }
                 }	
             }
-
             //뉴스 수집 기간
             if(collectdate){
                 collectdate = "당일";
@@ -91,14 +101,14 @@ function getKeywordOfGroup(group_name){
                 for(var i = 0; i < len; i++) {
                     if(collectdate == $($('.collect-date-btn')[i]).val()){
                         $($('.collect-date-btn')[i]).addClass("clicked-collect-date-btn");
+                    }else{
+                        $($('.collect-date-btn')[i]).removeClass("clicked-collect-date-btn");
                     }
                 }	
             }
-
             //메일 발송 설정
             $('#schedule-body').empty();
             for(var i=0; i<schedules.length;i++){
-                console.log("here");
                 add_schedule_function(schedules[i]);
             }
         },
@@ -106,6 +116,29 @@ function getKeywordOfGroup(group_name){
             alert(e.responseText);
         },
     });
+}
+
+function getNewKeywordOfGroup(){
+    //신규 버튼 누르고 빈 contents 보여줄 때
+    //키워드들
+    var len = $(".keyword-btn").length;
+    if(len > 0) {
+        for(var i = 0; i < len; i++) {
+            $($('.keyword-btn')[i]).removeClass("clicked-keyword-btn");
+        }	
+    }
+    //뉴스 수집 기간
+    len = $(".collect-date-btn").length;
+    if(len > 0) {
+        for(var i = 0; i < len; i++) {
+            $($('.collect-date-btn')[i]).removeClass("clicked-collect-date-btn");
+        }	
+    }
+    //메일 발송 설정
+    $('#schedule-body').empty();
+    for(var i=0; i<1; i++){
+        add_schedule_function();
+    }
 }
 
 //키워드 버튼 누르면 변하도록
@@ -139,13 +172,33 @@ function getKeywordOfGroup(group_name){
     const tableRow = $('<tr></tr>');
     // #차
     let dataCol = document.createElement('td');
-    dataCol.innerHTML = `
-    <td>
-        <div class="row_layout" style="font-weight: bold; font-size: 12px;">
-            ${len+1}차
-        </div>
-    </td>
-    `;
+    if(len==0){//+버튼 있어야함
+        dataCol.innerHTML = `
+        <td>
+            <div class="row_layout" style="font-weight: bold; font-size: 12px;">
+                1차
+                <svg id="add-schedule" width="15" height="15" viewBox="0 0 100 100" class="add-circle"
+                    style="margin-left: 3px; margin-top: 2px;" onclick="add_schedule_function()">
+                    <g stroke = "black" stroke-width = "12" fill="none">
+                        <path d="M 25 50 L 75 50
+                            M 50 25 L 50 75
+                            M 50 5
+                            A 45 45 0 0 0 50 95
+                            A 45 45 0 1 0 5 50" />
+                    </g>
+                </svg>
+            </div>
+        </td>
+        `;
+    }else{
+        dataCol.innerHTML = `
+        <td>
+            <div class="row_layout" style="font-weight: bold; font-size: 12px;">
+                ${len+1}차
+            </div>
+        </td>
+        `;
+    }
     tableRow.append(dataCol);
 
     let dataCol2 = document.createElement('td');
@@ -263,11 +316,8 @@ function getKeywordOfGroup(group_name){
   //그룹 저장(api 연결)
 $("#save-group").click(function(){
     console.log("그룹 저장");
-
     //그룹 이름
     var group_name = $('.clicked-group-btn').val();
-    console.log(group_name);
-
     //키워드들
     var keywords = $('.clicked-keyword-btn');
 	var len = keywords.length;
@@ -278,8 +328,6 @@ $("#save-group").click(function(){
             keywords_list.push($($('.clicked-keyword-btn')[i]).val());
 		}	
 	}
-    console.log(keywords_list);
-
     //당일 or 어제
     var collect_date = $('.clicked-collect-date-btn').val();
     if(collect_date=="당일"){
@@ -287,8 +335,6 @@ $("#save-group").click(function(){
     }else if(collect_date=="어제"){
         collect_date = false;
     }
-    console.log(collect_date);
-
     //스케줄 관련
     var schedules_list = [];
     var hours = $('.schedule-hour');
@@ -300,12 +346,10 @@ $("#save-group").click(function(){
             schedules_list.push(getTime($($('.schedule-hour')[i]).val(), $($('.schedule-minute')[i]).val()));
 		}
 	}
-    console.log(schedules_list);
     if(collect_date==undefined && keywords_list.length == 0){
         alert("모든 값을 입력해주세요.");
         return;
     }
-
     var data = {
         "name": group_name,
 	    "keywords": keywords_list,
@@ -313,6 +357,7 @@ $("#save-group").click(function(){
 	    // "users": file,//file형태로 전달
 	    "schedules":schedules_list
     }
+    console.log(data);
     $.ajax({
         url: '/clipping/clipgroup/',
         type: 'POST',
@@ -340,7 +385,7 @@ $("#save-group").click(function(){
             "name": group_name
         }
         $.ajax({
-            url: 'clipping/api/clipgroup',
+            url: 'clipping/clipgroup/',
             type: 'delete',
             datatype:'json',
             data: JSON.stringify(data),
