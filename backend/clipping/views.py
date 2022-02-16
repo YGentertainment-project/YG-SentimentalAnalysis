@@ -13,7 +13,7 @@ def base(request):
     '''
     # db연결 필요
     groups = Group.objects.filter()
-    keywords = Keyword.objects.all()
+    keywords = KeywordGroup.objects.all()
     print(groups)
     print(keywords)
     values = {

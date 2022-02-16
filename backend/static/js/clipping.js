@@ -1,3 +1,18 @@
+function getTime(minutes, seconds) {
+    minutes = parseInt(minutes);
+    seconds = parseInt(seconds);
+    //Optional: Add leading zero's
+    if (minutes < 10)
+        minutes = '0'+minutes;
+ 
+    if (seconds < 10)
+        seconds = '0'+seconds;
+ 
+    //Return the current minutes and seconds
+    return minutes+':'+seconds;
+ }
+
+
 //그룹 신규 등록 popup 관련
  $("#add-group").click(function(){
      // +버튼
@@ -25,15 +40,73 @@
  });
 
  function click_group_function(widget){
-    console.log($(widget));
     if($(widget).hasClass("clicked-group-btn")){
         $(widget).removeClass("clicked-group-btn");
+        $("#group_content").addClass("hide");
     }else{
         $(widget).addClass("clicked-group-btn");
-        $(".group-btn").not($(widget)).removeClass("clicked-group-btn");  
+        $(".group-btn").not($(widget)).removeClass("clicked-group-btn"); 
+        $("#group_content").removeClass("hide");
+        //content 보여줄 때 해당 그룹이름과 맞게 가져오기
+        console.log($(widget).val());
+        getKeywordOfGroup($(widget).val());
     }
-    //TODO: get api 연결
  }
+
+function getKeywordOfGroup(group_name){
+    //TODO: get api 연결
+    //일단 dummy data로 연결하기
+    $.ajax({
+        url: '/clipping/clipgroup/?' + $.param({
+            group: group_name
+        }),
+        type: 'GET',
+        datatype: 'json',
+        contentType: 'application/json; charset=utf-8',
+        success: res => {
+            console.log("success");
+            console.log(res);
+            var keywords = ["키워드1", "키워드3", "키워드8"];
+            var collectdate = true;
+            var schedules = ["1:1", "1:2", "1:3"];
+
+            //키워드들
+            var len = $(".keyword-btn").length;
+            if(len > 0) {
+                for(var i = 0; i < len; i++) {
+                    if( keywords.includes($($('.keyword-btn')[i]).val()) ){
+                        $($('.keyword-btn')[i]).addClass("clicked-keyword-btn");
+                    }
+                }	
+            }
+
+            //뉴스 수집 기간
+            if(collectdate){
+                collectdate = "당일";
+            }else{
+                collectdate = "어제";
+            }
+            len = $(".collect-date-btn").length;
+            if(len > 0) {
+                for(var i = 0; i < len; i++) {
+                    if(collectdate == $($('.collect-date-btn')[i]).val()){
+                        $($('.collect-date-btn')[i]).addClass("clicked-collect-date-btn");
+                    }
+                }	
+            }
+
+            //메일 발송 설정
+            $('#schedule-body').empty();
+            for(var i=0; i<schedules.length;i++){
+                console.log("here");
+                add_schedule_function(schedules[i]);
+            }
+        },
+        error: e => {
+            alert(e.responseText);
+        },
+    });
+}
 
 //키워드 버튼 누르면 변하도록
  $(".keyword-btn").click(function(){
@@ -57,6 +130,11 @@
 
  //스케줄 + 버튼 누르면
  $("#add-schedule").click(function(){
+    add_schedule_function();
+ });
+
+
+ function add_schedule_function(time){
     var len =  document.getElementById('schedule-body').childElementCount;
     const tableRow = $('<tr></tr>');
     // #차
@@ -70,13 +148,12 @@
     `;
     tableRow.append(dataCol);
 
-
     let dataCol2 = document.createElement('td');
     dataCol2.innerHTML = `
     <td>
         <div class="row_layout">
             <div style="width:80px;">
-                <select name="hour" id="hour-select" class="form-select schedule-hour">
+                <select name="hour" id="hour-select${len+1}" class="form-select schedule-hour">
                     <option value="0">00</option>
                     <option value="1">01</option>
                     <option value="2">02</option>
@@ -105,7 +182,7 @@
             </div>
             <span style="margin: 5px 10px 0 5px;">시</span>
             <div style="width:80px;">
-                <select name="minute" id="minute-select" class="form-select schedule-minute">
+                <select name="minute" id="minute-select${len+1}" class="form-select schedule-minute">
                     <option value="0">00</option>
                     <option value="1">01</option>
                     <option value="2">02</option>
@@ -174,12 +251,17 @@
     tableRow.append(dataCol2);
 
     $('#schedule-body').append(tableRow);
- });
+    if(time != null){
+        time = time.split(':');
+        $(`#hour-select${len+1}`).val(parseInt(time[0])).prop('selected',true);
+        $(`#minute-select${len+1}`).val(parseInt(time[1])).prop('selected',true);
+    }
+ }
 
 
 
   //그룹 저장(api 연결)
-  $("#save-group").click(function(){
+$("#save-group").click(function(){
     console.log("그룹 저장");
 
     //그룹 이름
@@ -210,17 +292,19 @@
     //스케줄 관련
     var schedules_list = [];
     var hours = $('.schedule-hour');
-    var minutes = $('.schedule-minute');
 	len = hours.length;
 	if(len > 0) {
 		for(var i = 0; i < len; i++) {
-            console.log($($('.schedule-hour')[i]).val());
             //$($('.schedule-hour')[i]).val()
             //$($('.schedule-minute')[i]).val()
-            schedules_list.push($($('.schedule-hour')[i]).val());
+            schedules_list.push(getTime($($('.schedule-hour')[i]).val(), $($('.schedule-minute')[i]).val()));
 		}
 	}
     console.log(schedules_list);
+    if(collect_date==undefined && keywords_list.length == 0){
+        alert("모든 값을 입력해주세요.");
+        return;
+    }
 
     var data = {
         "name": group_name,
