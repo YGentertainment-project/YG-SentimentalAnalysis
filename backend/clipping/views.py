@@ -1,6 +1,8 @@
-from ast import excepthandler
 import os
 import datetime 
+import openpyxl
+from openpyxl.writer.excel import save_virtual_workbook
+from django.http import HttpResponse
 from django.shortcuts import render
 from clipping.serializers import GroupKeywordSerializer, GroupScheduleSerializer, GroupSerializer, GroupUserSerializer
 from utils.api import APIView, validate_serializer
@@ -59,6 +61,86 @@ class KeywordAPI(APIView):
         Keyword list Excel Import
         '''
 
+class KeywordExcelAPI(APIView):
+    def get(self, request):
+        '''
+        Keyword list read API
+        '''
+        try:
+            keyword_groups = KeywordGroup.objects.all()
+            keywords = Keyword.objects.all()
+            if keyword_groups.exists():
+                keyword_table = {}
+                for keyword_group in keyword_groups:
+                    keyword_table[keyword_group.groupname] = []
+                for keyword in keywords:
+                    keyword_table[keyword.keywordgroup.groupname].append(keyword.keyword)
+                max_column = max([len(keywords) for keywords in keyword_table.items()])
+                new_wb = openpyxl.Workbook()
+                new_ws = new_wb.active
+                new_ws.cell(1, 1, '키워드')
+                for col in range(2, max_column + 1):
+                    new_ws.cell(1, col, f'동의어{col - 1}')
+                new_ws.cell(1, max_column + 1, '종류')
+                for idx1, keyword_group in enumerate(keyword_groups):
+                    groupname = keyword_group.groupname
+                    new_ws.cell(idx1 + 2, 1, groupname)
+                    for idx2, synonym in enumerate(keyword_table[groupname][1:]):
+                        new_ws.cell(idx1 + 2, idx2 + 2, synonym)
+                    new_ws.cell(idx1 + 2, max_column + 1, keyword_group.type)
+                filename = 'Keyword.xlsx'
+                file_response = HttpResponse(
+                    save_virtual_workbook(new_wb),
+                    content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                )
+                file_response['Content-Disposition'] = f'attachment;filename*=UTF-8\'\'{filename}'
+                return file_response
+            else:
+                return self.success()
+        except Exception as e:
+            return self.error("Keyword Group does not exist")
+
+    def post(self, request):
+        '''
+        Keyword list Excel Import
+        '''
+        keywordfile = request.FILES['KeywordFile']
+        keywordfile = openpyxl.load_workbook(keywordfile)
+        worksheet = keywordfile[keywordfile.sheetnames[0]]
+        column_max = 1
+        while True:
+            x = worksheet.cell(row=1, column=column_max).value
+            column_max += 1
+            if x is None:
+                break
+        row = 2
+        keyword_table = {}
+        while True:
+            keyword_groupname = worksheet.cell(row=row, column=1).value
+            if keyword_groupname is None:
+                break
+            keyword_table[keyword_groupname] = [keyword_groupname]
+            for col in range(2, column_max):
+                keyword = worksheet.cell(row=row, column=col).value
+                if keyword is not None:
+                    keyword_table[keyword_groupname].append(keyword)
+            row += 1
+        Keyword.objects.all().delete()
+        KeywordGroup.objects.all().delete()
+        print(keyword_table)
+        for keyword_group in keyword_table:
+            group_item = KeywordGroup.objects.create(
+                groupname = keyword_group,
+                type = keyword_table[keyword_group][-1],
+                news_platform = True,
+                sns_platform = True
+            )
+            for keyword in keyword_table[keyword_group][:-1]:
+                Keyword.objects.create(
+                    keywordgroup = group_item,
+                    keyword = keyword
+                )
+        return self.success()
 
 class ClippingGroupAPI(APIView):
     def get(self, request):
