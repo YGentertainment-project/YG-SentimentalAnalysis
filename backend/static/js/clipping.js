@@ -1,6 +1,7 @@
 //그룹 신규 등록 popup 관련
  $("#add-group").click(function(){
      // +버튼
+    $("#new_group_name").val("");
     document.getElementById("add-group-form").style.display = "flex";
  });
 
@@ -10,25 +11,29 @@
  });
 
  $("#add-group-form-save").click(function(){
-     // 저장 후 팝업 닫기
-    let newButton = document.createElement('input');
-    newButton.innerHTML = `
-        <input type="button" class="group-btn" value="{{${$("#new_group_name").val()}}}">
-    `;
+    // 저장 후 팝업 닫기
+    let newButton = $('<input class="group-btn" type="button" value="'+$("#new_group_name").val()+'"></input>');
+    newButton.click(function(){
+        click_group_function(newButton);
+    });
     $('#groups').append(newButton);
     document.getElementById("add-group-form").style.display = "none";
  });
 
  $(".group-btn").click(function(){
-    if($(this).hasClass("clicked-group-btn")){
-        $(this).removeClass("clicked-group-btn");
-    }else{
-        $(this).addClass("clicked-group-btn");
-        $(".group-btn").not($(this)).removeClass("clicked-group-btn");  
-    }
-    //TODO: 맞는 정보로 가져오기
-
+    click_group_function(this);
  });
+
+ function click_group_function(widget){
+    console.log($(widget));
+    if($(widget).hasClass("clicked-group-btn")){
+        $(widget).removeClass("clicked-group-btn");
+    }else{
+        $(widget).addClass("clicked-group-btn");
+        $(".group-btn").not($(widget)).removeClass("clicked-group-btn");  
+    }
+    //TODO: get api 연결
+ }
 
 //키워드 버튼 누르면 변하도록
  $(".keyword-btn").click(function(){
@@ -205,21 +210,22 @@
     //스케줄 관련
     var schedules_list = [];
     var hours = $('.schedule-hour');
-
+    var minutes = $('.schedule-minute');
 	len = hours.length;
 	if(len > 0) {
 		for(var i = 0; i < len; i++) {
             console.log($($('.schedule-hour')[i]).val());
+            //$($('.schedule-hour')[i]).val()
+            //$($('.schedule-minute')[i]).val()
             schedules_list.push($($('.schedule-hour')[i]).val());
 		}
 	}
-
     console.log(schedules_list);
 
     var data = {
         "name": group_name,
 	    "keywords": keywords_list,
-	    "collect_date": collect_date,//당일/어제/1주/1달??
+	    "collect_date": collect_date,//boolean
 	    // "users": file,//file형태로 전달
 	    "schedules":schedules_list
     }
@@ -241,11 +247,11 @@
 
   //그룹 삭제(api 연결)
   $("#delete-group").click(function(){
-    if (confirm("삭제하시겠습니까?")) {
-        console.log("그룹 삭제");
-        //그룹 이름
-        var group_name = $('.clicked-group-btn').val();
-        console.log(group_name);
+    var group_name = $('.clicked-group-btn').val();
+    if(group_name == undefined){
+        alert("삭제할 그룹을 선택해주세요.");
+    }
+    else if (confirm("삭제하시겠습니까?")) {
         var data = {
             "name": group_name
         }
