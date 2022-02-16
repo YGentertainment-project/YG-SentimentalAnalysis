@@ -12,7 +12,7 @@ def base(request):
     general page
     '''
     # db연결 필요
-    groups = Group.objects.filter()
+    groups = Group.objects.all()
     keywords = KeywordGroup.objects.all()
     print(groups)
     print(keywords)
@@ -145,7 +145,6 @@ class ClippingGroupAPI(APIView):
                     print("not valid")
         except:
             return self.error("cannot create Clipping Group keywords")
-
         # Create Clipping Group Schedule
         try:
             # To reflect add, update, remove keyword... delete all for this group

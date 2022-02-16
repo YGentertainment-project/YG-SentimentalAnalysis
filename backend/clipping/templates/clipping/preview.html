@@ -1,23 +1,11 @@
 <!DOCTYPE html>
-    {% load static %}
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <link rel="stylesheet" href="{% static 'css/clipping.css' %}">
-        <link rel="stylesheet" href="{% static 'css/volt.css' %}">
-        <link rel="stylesheet" href="{% static 'css/volt.css.map' %}">
-        <!-- GOOGLE FONTS LINK -->
-        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-        <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family= Titillium+Web:wght@700&display=swap" rel="stylesheet">
-        <link href="https://fonts.googleapis.com/css2?family=Do+Hyeon&display=swap" rel="stylesheet"> 
-        <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic&display=swap" rel="stylesheet">
-        <title>preview</title>
-    </head>
-    <body>
-        <span id="preview_title" style="font-size: 14px;"></span>
+<html lang="ko">
+
+   {% extends 'main.html' %}
+
+   {% block content %}
+    <div class="forms">
+          <span id="preview_title" style="font-size: 14px;"></span>
         <br>
         <span style="font-weight: bold; font-size: 14px;">키워드를 선택하세요</span>
         
@@ -40,10 +28,8 @@
               </li>    
             </ul>
         </div>
+    </div>
 
+   {% endblock content %}
 
-
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-        <script src="{% static 'js/preview.js' %}"></script>
-    </body>
 </html>
