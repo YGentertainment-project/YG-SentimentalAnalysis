@@ -122,6 +122,46 @@ class ClippingGroupAPI(APIView):
 
         group_id = group.data["id"]
 
+        # Create Clipping Group Users
+        try:
+            #========================================================#
+            # Load Excel for external User List...                   #
+            #========================================================#
+            load_wb = load_workbook(file, data_only=True)
+            load_ws = load_wb['Sheet1']
+
+            user_list = []
+
+            for row in load_ws.rows:
+                # Excel Format should be name, email, name, email...
+                user_tuple = []
+                for cell in row:
+                    # [[name, email], [name, email], ...]
+                    user_tuple.append(cell.value)
+                user_list.append(user_tuple)
+            #========================================================#
+
+            # To reflect add, update, remove user... delete all in this group
+            GroupUser.objects.filter(group_id=group_id).delete()
+            
+            #========================================================#
+            # Create Group Users in this Group                       #
+            #========================================================#
+            for user in user_list:
+                group_user_data = {
+                    "group": group_id,
+                    "name": user[0],
+                    "email": user[1]
+                }
+                group_user = GroupUserSerializer(data=group_user_data)
+                if group_user.is_valid():
+                    group_user.save()
+                else:
+                    return self.error("Create group user data is not valid")
+            #========================================================#
+        except:
+            return self.error("cannot create Clipping Group users")
+
         # Create Clipping Group Keyword
         try:
             # To reflect add, update, remove keyword... delete all in this group
