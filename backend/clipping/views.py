@@ -1,6 +1,6 @@
 from ast import excepthandler
 import os
-import datetime
+import datetime 
 from django.shortcuts import render
 from clipping.serializers import GroupKeywordSerializer, GroupScheduleSerializer, GroupSerializer, GroupUserSerializer
 from utils.api import APIView, validate_serializer
@@ -153,9 +153,11 @@ class ClippingGroupAPI(APIView):
 
             for schedule in data["schedules"]:
                 print("pass sche: " + schedule)
+                hour = int(schedule[0:2])
+                min = int(schedule[3:5])
                 group_schedule_data = {
                     "group": group_id,
-                    "time": datetime.strptime(schedule, "%H:%M").time()
+                    "time": datetime.time(hour, min, 0)
                 }
                 group_schedule = GroupScheduleSerializer(data=group_schedule_data)
                 if group_schedule.is_valid():
