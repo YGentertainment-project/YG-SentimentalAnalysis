@@ -112,6 +112,9 @@ class ClippingGroupAPI(APIView):
         except:
             return self.error("cannot create Clipping Group")
 
+        group_list = Group.objects.all()
+        for i in group_list:
+            print(i)
         # Create Clipping Group Users
         # try:  
         #     for user in data["users"]:
@@ -151,9 +154,11 @@ class ClippingGroupAPI(APIView):
 
             for schedule in data["schedules"]:
                 print("pass sche: " + schedule)
+                hour = int(schedule[0:2])
+                min = int(schedule[3:5])
                 group_schedule_data = {
                     "group": group_id,
-                    "time": datetime.strptime(schedule, "%H:%M").time()
+                    "time": datetime.time(hour, min, 0)
                 }
                 group_schedule = GroupScheduleSerializer(data=group_schedule_data)
                 if group_schedule.is_valid():
