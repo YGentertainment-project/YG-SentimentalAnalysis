@@ -1,3 +1,5 @@
+FROM python:3.9
+
 FROM tensorflow/tensorflow:2.7.0-gpu-jupyter
 
 WORKDIR /app

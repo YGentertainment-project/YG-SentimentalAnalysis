@@ -20,24 +20,24 @@ production_env = get_env("YG_ENV", "dev") == "production"
 
 
 def crawling(spider_name, from_date, to_date):
-    print('crawling start')
+    # print('crawling start')
     process = CrawlerProcess(settings)
     process.crawl(spider_loader.load(spider_name), from_date=from_date, to_date=to_date)
     process.start()
-    print('crawling finish')
+    # print('crawling finish')
 
 
 def nlpanalysis(from_date, to_date):
-    print('nlp analysis start')
+    # print('nlp analysis start')
     NLP.NLP_update(from_date, to_date)
-    print('nlp analysis finish')
+    # print('nlp analysis finish')
 
 
 @app.task(name="schedule_task", bind=True)
 def schedule_task(self, spider_name):
     current_time = datetime.now()
     from_date = to_date = current_time.strftime("%Y%m%d")
-    print(from_date, to_date)
+    # print(from_date, to_date)
     try:
         crawl_process = Process(target=crawling, args=[spider_name, from_date, to_date])
         crawl_process.start()

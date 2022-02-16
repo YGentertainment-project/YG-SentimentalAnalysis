@@ -41,3 +41,29 @@ services:
             - yg-mongodb          
         ports:
             - "0.0.0.0:80:8000"
+        command: >
+            sh -c "python3 manage.py makemigrations &&
+                   python3 manage.py migrate mongo &&
+                   python3 manage.py migrate default &&
+                   python3 manage.py runserver 0.0.0.0:8000 --insecure"
+
+    yg-rabbitmq:
+        image: rabbitmq:3.7.14-management-alpine
+        container_name: yg-rabbitmq
+        environment:
+            - RABBITMQ_USER=ygenter
+            - RABBITMQ_PASSWORD=ygenter
+        ports:
+            - "5672:5672"
+            - "15672:15672"
+
+    yg-celery-worker-beat:
+        image: sentimental-analysis
+        container_name: yg-celery-worker-beat
+        command: celery -A crawler worker --beat -c 6 -l info
+        ports: [ ]
+        links:
+            - yg-rabbitmq
+        depends_on:
+            - yg-rabbitmq
+            - yg-mariadb

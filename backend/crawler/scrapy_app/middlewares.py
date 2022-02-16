@@ -111,6 +111,7 @@ class IGSpiderMiddleware:
     def from_crawler(cls, crawler):
         s = cls()
         crawler.signals.connect(s.spider_opened, signal=signals.spider_opened)
+        crawler.signals.connect(s.spider_closed, signal=signals.spider_closed)
         return s
 
     def process_spider_input(self, response, spider):
@@ -151,6 +152,7 @@ class IGSpiderMiddleware:
         print(spider.name)
         print(spider.cookie)
         spider.driver.close()
+        spider.driver.quit()
         
 class TwitterSpiderMiddleware:
     @classmethod
