@@ -89,8 +89,6 @@
                 <div class="row_layout child-margin-5">
                     <input type="button" class="border-btn collect-date-btn" value="당일">
                     <input type="button" class="border-btn collect-date-btn" value="어제">
-                    <input type="button" class="border-btn collect-date-btn" value="1주">
-                    <input type="button" class="border-btn collect-date-btn" value="1달">
                 </div>
             </div>
     
@@ -106,9 +104,7 @@
                             <td class="border-0 rounded-end" style="width:260px; font-size: 12px !important;">내용</td>
                         </tr>
                     </thead>
-                    <tbody id="schedule-body">
-                        <tr>
-                            <td style="font-weight: bold; font-size: 12px;">
+                    <tbody id="schedule-body"><tr><td style="font-weight: bold; font-size: 12px;">
                                 <div class="row_layout">
                                     1차
                                     <svg id="add-schedule" width="15" height="15" viewBox="0 0 100 100" class="add-circle"
@@ -122,11 +118,10 @@
                                         </g>
                                     </svg>
                                 </div>
-                            </td>
-                            <td>
+                            </td><td>
                                 <div class="row_layout">
                                     <div style="width:80px;">
-                                        <select name="hour" id="hour-select" class="form-select">
+                                        <select name="hour" id="hour-select" class="form-select schedule-hour">
                                             <option value="0">00</option>
                                             <option value="1">01</option>
                                             <option value="2">02</option>
@@ -155,7 +150,7 @@
                                     </div>
                                     <span style="margin: 5px 10px 0 5px;">시</span>
                                     <div style="width:80px;">
-                                        <select name="minute" id="minute-select" class="form-select">
+                                        <select name="minute" id="minute-select" class="form-select schedule-minute">
                                             <option value="0">00</option>
                                             <option value="1">01</option>
                                             <option value="2">02</option>
@@ -221,9 +216,7 @@
                                     <span style="margin: 5px 10px 0 5px;">분</span>
                                 </div>
 
-                            </td>
-                        </tr>
-                    </tbody>
+                            </td></tr></tbody>
                 </table>
             </div>
     

@@ -50,7 +50,7 @@
     console.log("click");
  });
 
- //스케줄 +
+ //스케줄 + 버튼 누르면
  $("#add-schedule").click(function(){
     var len =  document.getElementById('schedule-body').childElementCount;
     const tableRow = $('<tr></tr>');
@@ -171,13 +171,17 @@
     $('#schedule-body').append(tableRow);
  });
 
-  //그룹 저장
+
+
+  //그룹 저장(api 연결)
   $("#save-group").click(function(){
     console.log("그룹 저장");
 
+    //그룹 이름
     var group_name = $('.clicked-group-btn').val();
     console.log(group_name);
 
+    //키워드들
     var keywords = $('.clicked-keyword-btn');
 	var len = keywords.length;
     var keywords_list = [];
@@ -189,9 +193,25 @@
 	}
     console.log(keywords_list);
 
+    //당일 or 어제
     var collect_date = $('.clicked-collect-date-btn').val();
     console.log(collect_date);
 
+    //스케줄 관련
+    var schedules_list = [];
+    var hours = $('.schedule-hour');
+    var 
+	var len = hours.length;
+	if(len > 0) {
+		for(var i = 0; i < len; i++) {
+            console.log($($('.schedule-hour')[i]).val());
+            schedules_list.push($($('.schedule-hour')[i]).val());
+		}	
+	}
+
+    console.log(schedules_list);
+
+    return;
     var data = {
         "name": group_name,
 	    "keywords": keywords_list,
@@ -199,7 +219,6 @@
 	    // "users": file,//file형태로 전달
 	    "schedules":[times]
     }
-    return;
     $.ajax({
         url: '/clipping/api/clipgroup',
         type: 'POST',
