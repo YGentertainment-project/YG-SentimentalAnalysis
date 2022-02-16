@@ -107,7 +107,6 @@ class ClippingGroupAPI(APIView):
                 if group.is_valid():
                     group.save()
                 else:
-                    print("fuck")
                     return self.error("cannot create Clipping Group")
 
             else:
@@ -116,11 +115,13 @@ class ClippingGroupAPI(APIView):
                 if group.is_valid():
                     group.save()
                 else:
-                    print("fuck")
                     return self.error("cannot create Clipping Group")
         except:
             return self.error("cannot create Clipping Group")
 
+        group_list = Group.objects.all()
+        for i in group_list:
+            print(i)
         # Create Clipping Group Users
         # try:  
         #     for user in data["users"]:
@@ -152,9 +153,10 @@ class ClippingGroupAPI(APIView):
                     print("not valid")
         except:
             return self.error("cannot create Clipping Group keywords")
+
         # Create Clipping Group Schedule
         try:
-            # To reflect add, update, remove keyword... delete all for this group
+            # To reflect add, update, remove schedule... delete all for this group
             GroupSchedule.objects.filter(group_id=group_id).delete()
 
             for schedule in data["schedules"]:
@@ -170,7 +172,6 @@ class ClippingGroupAPI(APIView):
                     group_schedule.save()
                 else:
                     print("not valid")
-                # GroupSchedule.objects.create(**group_schedule_data)
         except:
             return self.error("cannot create Clipping Group schedules")
         
