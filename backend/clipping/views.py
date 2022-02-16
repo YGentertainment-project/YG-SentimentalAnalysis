@@ -1,7 +1,7 @@
 from ast import excepthandler
 import os
 from django.shortcuts import render
-from backend.clipping.serializers import GroupSerializer
+from clipping.serializers import GroupSerializer
 from utils.api import APIView, validate_serializer
 from .models import Keyword, KeywordGroup, Group, GroupKeyword, GroupSchedule, GroupUser
 from rest_framework.parsers import JSONParser
