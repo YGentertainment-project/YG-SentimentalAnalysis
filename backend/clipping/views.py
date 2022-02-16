@@ -1,11 +1,23 @@
 from ast import excepthandler
 import os
 from django.shortcuts import render
-from itsdangerous import Serializer
 from backend.clipping.serializers import GroupSerializer
 from utils.api import APIView, validate_serializer
 from .models import Keyword, KeywordGroup, Group, GroupKeyword, GroupSchedule, GroupUser
 from rest_framework.parsers import JSONParser
+
+def base(request):
+    '''
+    general page
+    '''
+    # db연결 필요
+    values = {
+        'groups': ['그룹1', '그룹2'],
+        'keywords': ['키워드1', '키워드2', '키워드2', '키워드2', '키워드2', '키워드2', '키워드2', '키워드2', '키워드2', '키워드2'
+        , '키워드2', '키워드2', '키워드2', '키워드2', '키워드2', '키워드2', '키워드2', '키워드2'
+        , '키워드2', '키워드2', '키워드2', '키워드2', '키워드2', '키워드2', '키워드2', '키워드냠냠'],
+    }
+    return render(request, 'clipping/clipping.html', values)
 
 class KeywordAPI(APIView):
     def get(self, request):
