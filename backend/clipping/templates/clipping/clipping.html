@@ -76,7 +76,7 @@
                 </div>
             </div>
     
-            <div>
+            <div style="margin-top: 10px;">
                 <span class="subtitle" style="margin-top: 5px;">수신인 설정(아직 연동x)</span>
                 <div class="row_layout child-margin-5">
                     <button class="border-btn">엑셀 다운로드</button>
@@ -84,7 +84,7 @@
                 </div>
             </div>
     
-            <div>
+            <div style="margin-top: 10px;">
                 <span class="subtitle">뉴스 수집 기간</span>
                 <div class="row_layout child-margin-5">
                     <input type="button" class="border-btn collect-date-btn" value="당일">
@@ -94,23 +94,39 @@
                 </div>
             </div>
     
-            <div>
-                <span class="subtitle">메일 발송 설정</span>
+            <div style="margin-top: 10px;">
+                <div class="row_layout">
+                    <span class="subtitle">메일 발송 설정</span>
+                    <input checked type="checkbox" style="margin-top: 3px; margin-left: 8px;"></input>
+                </div>
                 <table class="table table-centered table-nowrap mb-0 rounded" style="width: 40%;">
-                    <thead class="thead-dark" style="text-align: center !important;
-                    font-weight: bold;">
+                    <thead class="thead-dark" style="text-align: center !important; font-weight: bold;">
                         <tr>
-                            <td class="border-0 rounded-start">횟수</td>
-                            <td class="border-0 rounded-end" style="width:260px;">내용</td>
+                            <td class="border-0 rounded-start" style="font-size: 12px !important;">횟수</td>
+                            <td class="border-0 rounded-end" style="width:260px; font-size: 12px !important;">내용</td>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="schedule-body">
                         <tr>
-                            <td>1차</td>
+                            <td style="font-weight: bold; font-size: 12px;">
+                                <div class="row_layout">
+                                    1차
+                                    <svg id="add-schedule" width="15" height="15" viewBox="0 0 100 100" class="add-circle"
+                                    style="margin-left: 3px; margin-top: 2px;">
+                                        <g stroke = "black" stroke-width = "12" fill="none">
+                                            <path d="M 25 50 L 75 50
+                                                    M 50 25 L 50 75
+                                                    M 50 5
+                                                    A 45 45 0 0 0 50 95
+                                                    A 45 45 0 1 0 5 50" />
+                                        </g>
+                                    </svg>
+                                </div>
+                            </td>
                             <td>
                                 <div class="row_layout">
-                                    <div style="width:130px;">
-                                        <select style="margin:2px;" name="hour" id="hour-select" class="form-select">
+                                    <div style="width:80px;">
+                                        <select name="hour" id="hour-select" class="form-select">
                                             <option value="0">00</option>
                                             <option value="1">01</option>
                                             <option value="2">02</option>
@@ -137,9 +153,9 @@
                                             <option value="23">23</option>
                                         </select>
                                     </div>
-                                    <span style="margin-top: 5px; margin-right: 10px;">시</span>
-                                    <div style="width:130px;">
-                                        <select style="margin:2px;" name="minute" id="minute-select" class="form-select">
+                                    <span style="margin: 5px 10px 0 5px;">시</span>
+                                    <div style="width:80px;">
+                                        <select name="minute" id="minute-select" class="form-select">
                                             <option value="0">00</option>
                                             <option value="1">01</option>
                                             <option value="2">02</option>
@@ -202,9 +218,7 @@
                                             <option value="59">59</option>
                                         </select>
                                     </div>
-                                    <span style="margin-top: 5px;">분</span>
-
-
+                                    <span style="margin: 5px 10px 0 5px;">분</span>
                                 </div>
 
                             </td>
@@ -213,7 +227,7 @@
                 </table>
             </div>
     
-            <button class="btn btn-primary border-0">미리보기</button>
+            <button class="btn btn-primary" style="margin-top: 10px;">미리보기(아직 연동x)</button>
         </div>
 
 
