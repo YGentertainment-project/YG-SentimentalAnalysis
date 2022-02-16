@@ -23,8 +23,16 @@ button{
     text-align: center;
 }
 
+.column_layout{
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+}
+
 /* 그룹 버튼 */
-.border-btn{
+.group-btn{
+    outline: none;
+    border: none;
     font-size: 12px !important;
     font-weight: bold;
     background-color: white !important;
@@ -33,35 +41,35 @@ button{
     cursor:pointer;
     font-weight: bold;
     color: black;
-    /* outline: 1.5px solid #1F2937; */
     border-radius: 14px;
-    border-color: #16fdde !important;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255), 0 1px 2px rgba(17, 24, 39);
     transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
-.border-btn:hover{
-    background-color: #16fdde !important;
+.group-btn:hover{
+    background-color: #292929 !important;
     color: white;
 }
 
-.clicked-border-btn{
+.clicked-group-btn{
+    outline: none;
+    border: none;
     font-size: 12px !important;
     font-weight: bold;
-    background-color: #16fdde !important;
+    background-color: #292929 !important;
     padding: 4px 12px 4px 12px !important;
     cursor:pointer;
     font-weight: bold;
     color: white;
-    /* outline: 1.5px solid #1F2937; */
     border-radius: 14px;
-    border-color: #1F2937 !important;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255), 0 1px 2px rgba(17, 24, 39);
     transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
 /* 키워드 버튼 */
-.keyword-btn{
+.border-btn{
+    outline: none;
+    border: none;
     font-size: 12px !important;
     font-weight: bold;
     background-color: white !important;
@@ -70,19 +78,19 @@ button{
     cursor: pointer;
     font-weight: bold;
     color: black;
-    /* outline: 1.5px solid #1F2937; */
     border-radius: 14px;
-    border-color: #1F2937 !important;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255), 0 1px 2px rgba(17, 24, 39);
     transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
-.keyword-btn:hover{
+.border-btn:hover{
     background-color: #1F2937 !important;
     color: white;
 }
 
-.clicked-keyword-btn{
+.clicked-border-btn{
+    outline: none;
+    border: none;
     font-size: 12px !important;
     font-weight: bold;
     background-color: #1F2937 !important;
@@ -90,9 +98,7 @@ button{
     cursor: pointer;
     font-weight: bold;
     color: white;
-    /* outline: 1.5px solid #1F2937; */
     border-radius: 14px;
-    border-color: #1F2937 !important;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255), 0 1px 2px rgba(17, 24, 39);
     transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
@@ -126,4 +132,55 @@ button{
     border-radius: 10px;
     background-color: white;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255,0.5), 0 3px 3px rgba(17, 24, 39,0.5);
+}
+
+svg .add-circle{
+    border: 0.1rem solid #CCCCCC;
+    width: 15px;
+    height: 15px;
+    cursor: pointer;
+}
+
+svg g {
+    stroke: #666666;
+    fill: white;
+}
+  
+svg:hover g {
+    stroke: white;
+    fill: #666666;
+}
+  
+svg:active g {
+    stroke: #666666;
+    fill: white;
+}
+
+.add-group-form{
+    width: 40% !important;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    padding-right: 10px;
+    padding-left: 10px;
+    display: none;
+    position: absolute;
+    top: 150px;
+    left: 0;
+    right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap;
+    z-index: 100;
+    transition: transform 0.3s ease-out;
+    transform: translate(0, -50px);
+    pointer-events: auto;
+    background-color: #ffffff;
+    background-clip: padding-box;
+    border: 0.0625rem solid rgba(17, 24, 39, 0.2);
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 5px rgba(140, 152, 164, 0.2);
+    outline: 0;
 }

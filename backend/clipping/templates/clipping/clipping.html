@@ -15,31 +15,52 @@
         <link href="https://fonts.googleapis.com/css2?family=Do+Hyeon&display=swap" rel="stylesheet"> 
         <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic&display=swap" rel="stylesheet">
     
-
         <title>clipping</title>
     </head>
     <body>
+
+        <div class="add-group-form" id="add-group-form">
+            <div class="column_layout">
+                <span class="subtitle">생성할 그룹이름을 입력하세요</span>
+                <input type="text" placeholder="group1" style="margin: 5px 0 5px 0;" id="new_group_name">
+                <div class="row_layout" style="justify-content: center;">
+                    <button class="btn btn-primary" id="add-group-form-close" style="font-size: 10px !important; font-weight: bold; margin-right: 10px !important;">닫기</button>
+                    <button class="btn btn-primary" id="add-group-form-save" style="font-size: 10px !important; font-weight: bold;">저장</button>
+                </div>
+            </div>
+       </div>
+
         <span class="subtitle" style="padding-left: 10px;">NEWS 클리핑 그룹을 선택하세요</span>
-        <div class="row_layout child-margin-5" style="padding-left: 10px;">
-            {% if groups %}
-            {% for group in groups %}
-            <button class="border-btn">
-                {{group}}
-            </button>
-            {% endfor %}
-            {% else %}
-            {% endif %}
-            <span style="cursor: pointer; margin-right: 2px;">
-                <svg id="add-sub" width="25" height="25" viewBox="0 0 100 100">
-                    <g stroke = "black" stroke-width = "12" fill="none">
-                        <path d="M 25 50 L 75 50
-                                M 50 25 L 50 75
-                                M 50 5
-                                A 45 45 0 0 0 50 95
-                                A 45 45 0 1 0 5 50" />
-                    </g>
-                </svg>
-            </span>
+        <div class="row_layout" style="padding-left: 10px; justify-content: space-between;">
+            <div class="row_layout">
+                <div class="row_layout child-margin-5" id="groups">
+                    {% if groups %}
+                    {% for group in groups %}
+                        <input type="button" class="group-btn" value="{{group}}">
+                    {% endfor %}
+                    {% else %}
+                    {% endif %}
+                </div>
+    
+                <span style="cursor: pointer; margin-left: 2px; margin-top: 5px;">
+                    <svg id="add-group" width="25" height="25" viewBox="0 0 100 100" class="add-circle">
+                        <g stroke = "black" stroke-width = "12" fill="none">
+                            <path d="M 25 50 L 75 50
+                                    M 50 25 L 50 75
+                                    M 50 5
+                                    A 45 45 0 0 0 50 95
+                                    A 45 45 0 1 0 5 50" />
+                        </g>
+                    </svg>
+                </span>
+            </div>
+
+            <div class="row_layout child-margin-5" style="justify-content: flex-end; align-items: flex-end; margin-right: 1%; ">
+                <button id="save-group" class="btn btn-primary"
+                    style="font-size: 10px !important; font-weight: bold;">저장</button>
+                <button id="delete-group" class="btn btn-danger"
+                    style="font-size: 10px !important; font-weight: bold;">삭제</button>
+            </div>
         </div>
         
         <div id="group_content" class="group_content">
@@ -48,9 +69,7 @@
                 <div class="keyword-board child-margin-5">
                     {% if keywords %}
                     {% for keyword in keywords %}
-                    <button class="keyword-btn">
-                        {{keyword}}
-                    </button>
+                        <input type="button" class="border-btn keyword-btn" value="{{keyword}}">
                     {% endfor %}
                     {% else %}
                     {% endif %}
@@ -58,20 +77,20 @@
             </div>
     
             <div>
-                <span class="subtitle" style="margin-top: 5px;">수신인 설정</span>
+                <span class="subtitle" style="margin-top: 5px;">수신인 설정(아직 연동x)</span>
                 <div class="row_layout child-margin-5">
-                    <button class="keyword-btn">엑셀 다운로드</button>
-                    <button class="keyword-btn">엑셀 업로드</button>
+                    <button class="border-btn">엑셀 다운로드</button>
+                    <button class="border-btn">엑셀 업로드</button>
                 </div>
             </div>
     
             <div>
                 <span class="subtitle">뉴스 수집 기간</span>
                 <div class="row_layout child-margin-5">
-                    <button class="keyword-btn">당일</button>
-                    <button class="keyword-btn">어제</button>
-                    <button class="keyword-btn">1주</button>
-                    <button class="keyword-btn">1달</button>
+                    <input type="button" class="border-btn collect-date-btn" value="당일">
+                    <input type="button" class="border-btn collect-date-btn" value="어제">
+                    <input type="button" class="border-btn collect-date-btn" value="1주">
+                    <input type="button" class="border-btn collect-date-btn" value="1달">
                 </div>
             </div>
     
@@ -82,7 +101,7 @@
                     font-weight: bold;">
                         <tr>
                             <td class="border-0 rounded-start">횟수</td>
-                            <td class="border-0 rounded-end"  style="width:260px;">내용</td>
+                            <td class="border-0 rounded-end" style="width:260px;">내용</td>
                         </tr>
                     </thead>
                     <tbody>
@@ -203,5 +222,3 @@
         <script src="{% static 'js/clipping.js' %}"></script>
     </body>
 </html>
-
-
