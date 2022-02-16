@@ -19,7 +19,7 @@ class FBSpider(scrapy.Spider):
     start_urls = ['https://apps.crowdtangle.com/']
     custom_settings = {
         'SPIDER_MIDDLEWARES': {
-            'crawler.scrapy.middlewares.IGSpiderMiddleware': 100
+            'crawler.scrapy_app.middlewares.IGSpiderMiddleware': 100
         }
     }
     post_per_day=100

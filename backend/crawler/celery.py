@@ -1,5 +1,6 @@
 import os
 from celery import Celery
+from celery.schedules import crontab
 from utils.shortcuts import get_env
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "yg.settings")
@@ -23,3 +24,18 @@ app.conf.update(
     beat_scheduler='django_celery_beat.schedulers:DatabaseScheduler',
     worker_redirect_stdouts_level='INFO',
 )
+
+# 스케줄링 지정 부분
+app.conf.beat_schedule = {
+    "News-schedule-6am": {
+        "task": "schedule_task",
+        "schedule": crontab(minute=28, hour=14),
+        "args": ["News"],
+    },
+    # "News-schedule-6pm": {
+    #     "task": "schedule_task",
+    #     "schedule": crontab(minute=0, hour=18),
+    #     "args": ["News"],n
+    # }
+    # 다른 크롤러에 대한 스케줄링을 추가하고 싶다면, [News]에 해당하는 부분을 다른 spider의 이름으로 변경하면 됩니다.
+}
