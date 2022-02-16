@@ -1,7 +1,8 @@
 from ast import excepthandler
 import os
+import datetime
 from django.shortcuts import render
-from clipping.serializers import GroupSerializer
+from clipping.serializers import GroupSerializer, GroupUserSerializer
 from utils.api import APIView, validate_serializer
 from .models import Keyword, KeywordGroup, Group, GroupKeyword, GroupSchedule, GroupUser
 from rest_framework.parsers import JSONParser
@@ -73,44 +74,68 @@ class ClippingGroupAPI(APIView):
         '''
         Clipping Group Create API
         '''
-        data = request.data
-        print(data)
+        data = next(iter(request.data.dict()))
+        print(data.type)
+        print(data["keywords"])
+        print(data["schedules"])
+
+        # user_list = data["users"]
+        # print(user_list)
+
         try:
             # Create Clipping Group
-            group_data = []
-            group_data.append(data["name"])
-            group_data.append(data["collect_date"])
-            group = Group.objects.create(**group_data)
+            group = Group(
+                name = data["name"],
+                collect_date = data["collect_date"]
+            )
+            group.save()
         except:
             return self.error("cannot create Clipping Group")
-        else:
-            try:
-                # Create Clipping Group Users
-                for user in data["users"]:
-                    group_user_data = [ group ]
-                    group_user_data.append(user["name"])
-                    group_user_data.append(user["email"])
-                    GroupUser.objects.create(**group_user_data)
-            except:
-                return self.error("cannot create Clipping Group users")
-            
-            try:
-                # Create Clipping Group Keyword
-                for keyword in data["keywords"]:
-                    group_keyword_data = [ group ]
-                    group_keyword_data.append(keyword)
-                    GroupKeyword.objects.create(**group_keyword_data)
-            except:
-                return self.error("cannot create Clipping Group keywords")
 
-            try:
-                # Create Clipping Group Schedule
-                for schedule in data["schedules"]:
-                    group_schedule_data = [ group ]
-                    group_schedule_data.append(schedule)
-                    GroupSchedule.objects.create(**group_schedule_data)
-            except:
-                return self.error("cannot create Clipping Group schedules")
+        # try:
+        #     # Create Clipping Group Users
+        #     for user in user_list:
+        #         # group_user_data = [ group.id ]
+        #         # group_user_data.append(user["name"])
+        #         # group_user_data.append(user["email"])
+                
+        #         # group_user_data = {
+        #         #     "group": group.id,
+        #         #     "name": user["name"],
+        #         #     "email": user["email"]
+        #         # }
+
+        #         group_user = GroupUser(
+        #             group_id = group.id,
+        #             name = user["name"],
+        #             email = user["email"]
+        #         )
+        #         group_user.save()
+        # except:
+        #     return self.error("cannot create Clipping Group users")
+        
+        # try:
+        #     # Create Clipping Group Keyword
+        #     for keyword in keyword_list:
+        #         # group_keyword_data = [ group.id ]
+        #         # group_keyword_data.append( keyword )
+        #         # GroupKeyword.objects.create(**group_keyword_data)
+        #         group_keyword = GroupKeyword(
+        #             group_id = group.id,
+        #             keyword = keyword
+        #         )
+        #         group_keyword.save()
+        # except:
+        #     return self.error("cannot create Clipping Group keywords")
+
+        # try:
+        #     # Create Clipping Group Schedule
+        #     for schedule in schedule_list:
+        #         group_schedule_data = [ group.id ]
+        #         group_schedule_data.append( datetime.strptime(schedule, "%H:%M"))
+        #         GroupSchedule.objects.create(**group_schedule_data)
+        # except:
+        #     return self.error("cannot create Clipping Group schedules")
         
         return self.success(GroupSerializer(group).data)
     
@@ -118,7 +143,7 @@ class ClippingGroupAPI(APIView):
         '''
         Clipping Group Update API
         '''
-        data = request.data
+        data = JSONParser().parse(request)
         try:
             # Create Clipping Group
             group_data = []
@@ -126,9 +151,10 @@ class ClippingGroupAPI(APIView):
             group_data.append(data["collect_date"])
             group = Group.objects.update(**group_data)
         except:
-            return self.error("cannot create Clipping Group")
+            return self.error("cannot update Clipping Group")
         else:
             try:
+                # Check existing user group
                 # Create Clipping Group Users
                 for user in data["users"]:
                     group_user_data = [ group ]
@@ -136,7 +162,7 @@ class ClippingGroupAPI(APIView):
                     group_user_data.append(user["email"])
                     GroupUser.objects.update(**group_user_data)
             except:
-                return self.error("cannot create Clipping Group users")
+                return self.error("cannot update Clipping Group users")
             
             try:
                 # Create Clipping Group Keyword
@@ -145,7 +171,7 @@ class ClippingGroupAPI(APIView):
                     group_keyword_data.append(keyword)
                     GroupKeyword.objects.update(**group_keyword_data)
             except:
-                return self.error("cannot create Clipping Group keywords")
+                return self.error("cannot update Clipping Group keywords")
 
             try:
                 # Create Clipping Group Schedule
@@ -154,6 +180,6 @@ class ClippingGroupAPI(APIView):
                     group_schedule_data.append(schedule)
                     GroupSchedule.objects.update(**group_schedule_data)
             except:
-                return self.error("cannot create Clipping Group schedules")
+                return self.error("cannot update Clipping Group schedules")
         
         return self.success(GroupSerializer(group).data)

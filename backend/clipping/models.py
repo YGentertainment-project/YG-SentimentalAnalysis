@@ -38,7 +38,7 @@ class Group(models.Model):
 
 class GroupUser(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
-    name = models.TextField(unique=True)
+    name = models.TextField(default="")
     email = models.TextField(unique=True)
     create_dt = models.DateTimeField(auto_now_add=True)
     update_dt = models.DateTimeField(auto_now_add=True)
@@ -59,7 +59,8 @@ class GroupSchedule(models.Model):
 
 class GroupKeyword(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
-    keyword = models.ForeignKey(KeywordGroup, on_delete=models.CASCADE)
+    # keyword = models.ForeignKey(KeywordGroup, on_delete=models.CASCADE)
+    keyword = models.TextField()
     create_dt = models.DateTimeField(auto_now_add=True)
     update_dt = models.DateTimeField(auto_now_add=True)
 
