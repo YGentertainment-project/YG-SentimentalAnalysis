@@ -29,8 +29,8 @@ class Group(models.Model):
     name = models.TextField(unique=True)
     collect_date = models.BooleanField(default=False)
     # false = yesterday, true = today
-    create_dt = models.DateTimeField(auto_now_add=True)
-    update_dt = models.DateTimeField(auto_now_add=True)
+    # create_dt = models.DateTimeField(auto_now_add=True)
+    # update_dt = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = "clipping_group"
@@ -40,8 +40,8 @@ class GroupUser(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
     name = models.TextField(default="")
     email = models.TextField(unique=True)
-    create_dt = models.DateTimeField(auto_now_add=True)
-    update_dt = models.DateTimeField(auto_now_add=True)
+    # create_dt = models.DateTimeField(auto_now_add=True)
+    # update_dt = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = "clipping_group_user"
@@ -50,8 +50,8 @@ class GroupUser(models.Model):
 class GroupSchedule(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
     time = models.TimeField() # mailing time
-    create_dt = models.DateTimeField(auto_now_add=True)
-    update_dt = models.DateTimeField(auto_now_add=True)
+    # create_dt = models.DateTimeField(auto_now_add=True)
+    # update_dt = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = "clipping_schedule"
@@ -61,8 +61,8 @@ class GroupKeyword(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
     # keyword = models.ForeignKey(KeywordGroup, on_delete=models.CASCADE)
     keyword = models.TextField()
-    create_dt = models.DateTimeField(auto_now_add=True)
-    update_dt = models.DateTimeField(auto_now_add=True)
+    # create_dt = models.DateTimeField(auto_now_add=True)
+    # update_dt = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = "clipping_keyword"
