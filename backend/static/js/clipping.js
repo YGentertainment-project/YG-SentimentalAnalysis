@@ -9,7 +9,7 @@ function getTime(minutes, seconds) {
         seconds = '0'+seconds;
  
     //Return the current minutes and seconds
-    return minutes+':'+seconds;
+    return minutes+':'+seconds+':00';
  }
 
 
@@ -401,3 +401,7 @@ $("#save-group").click(function(){
  });
 
 
+//미리보기 화면으로 이동
+$("#go-to-preview").click(function(){
+    location.href = "/clipping/preview/";
+});

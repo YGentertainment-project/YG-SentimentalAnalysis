@@ -24,6 +24,12 @@ def base(request):
     }
     return render(request, 'clipping/clipping.html', values)
 
+def preview(request):
+    '''
+    preview page
+    '''
+    return render(request, 'clipping/preview.html')
+
 class KeywordAPI(APIView):
     def get(self, request):
         '''
