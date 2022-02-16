@@ -16,47 +16,33 @@ function getCookie(name) {
 }
 
 //sidebar toggle 
-$(".data-report").click(function(){
-   if(!$('.data-report-in').hasClass("show")){
-    $('.data-report-in').removeClass("hide")
-    $('.data-report-in').addClass("show")
-   } else{
-    $('.data-report-in').removeClass("show")
-    $('.data-report-in').addClass("hide")
-   }
-});
-
-
-
-$(".platforms-m").click(function(){
-    if(!$('.platform-in').hasClass("show")){
-        $('.platform-in').removeClass("hide")
-        $('.platform-in').addClass("show")
+$(".data-m").click(function(){
+    if(!$('.data-in').hasClass("show")){
+        $('.data-in').removeClass("hide")
+        $('.data-in').addClass("show")
     } else{
-        $('.platform-in').removeClass("show")
-        $('.platform-in').addClass("hide")
+        $('.data-in').removeClass("show")
+        $('.data-in').addClass("hide")
     }
 });
 
-
-
-$(".artists-m").click(function(){
-    if(!$('.artist-in').hasClass("show")){
-        $('.artist-in').removeClass("hide")
-        $('.artist-in').addClass("show")
+$(".clipping-m").click(function(){
+    if(!$('.clipping-in').hasClass("show")){
+        $('.clipping-in').removeClass("hide")
+        $('.clipping-in').addClass("show")
     } else{
-        $('.artist-in').removeClass("show")
-        $('.artist-in').addClass("hide")
+        $('.clipping-in').removeClass("show")
+        $('.clipping-in').addClass("hide")
     }
 });
 
-$(".monitering-m").click(function(){
-    if(!$('.monitering-in').hasClass("show")){
-        $('.monitering-in').removeClass("hide")
-        $('.monitering-in').addClass("show")
+$(".keyword-m").click(function(){
+    if(!$('.keyword-in').hasClass("show")){
+        $('.keyword-in').removeClass("hide")
+        $('.keyword-in').addClass("show")
     } else{
-        $('.monitering-in').removeClass("show")
-        $('.monitering-in').addClass("hide")
+        $('.keyword-in').removeClass("show")
+        $('.keyword-in').addClass("hide")
     }
 });
 
