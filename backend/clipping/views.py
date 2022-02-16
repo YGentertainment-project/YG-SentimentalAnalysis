@@ -65,7 +65,10 @@ class ClippingGroupAPI(APIView):
         '''
         Clipping Group Read API
         '''
-        group_id = request.GET.get("group_id")
+        data = request.GET.get("group_id")
+        print(data)
+        group_id = data
+        # print(group_id)
         if not group_id:
             return self.error()
         try:
@@ -91,7 +94,9 @@ class ClippingGroupAPI(APIView):
         Clipping Group Create/Update API
         '''
         data = JSONParser().parse(request)
-        file = request.FILES['file_excel']
+        # print(data)
+        # if data["users"]:
+        #     file = request.FILES['file_excel']
 
         try:
             # Create Clipping Group
@@ -127,44 +132,45 @@ class ClippingGroupAPI(APIView):
         group_id = group.data["id"]
 
         # Create Clipping Group Users
-        try:
-            #========================================================#
-            # Load Excel for external User List...                   #
-            #========================================================#
-            load_wb = load_workbook(file, data_only=True)
-            load_ws = load_wb['Sheet1']
+        # if file:
+        #     try:
+        #         #========================================================#
+        #         # Load Excel for external User List...                   #
+        #         #========================================================#
+        #         load_wb = load_workbook(file, data_only=True)
+        #         load_ws = load_wb['Sheet1']
 
-            user_list = []
+        #         user_list = []
 
-            for row in load_ws.rows:
-                # Excel Format should be name, email, name, email...
-                user_tuple = []
-                for cell in row:
-                    # [[name, email], [name, email], ...]
-                    user_tuple.append(cell.value)
-                user_list.append(user_tuple)
-            #========================================================#
+        #         for row in load_ws.rows:
+        #             # Excel Format should be name, email, name, email...
+        #             user_tuple = []
+        #             for cell in row:
+        #                 # [[name, email], [name, email], ...]
+        #                 user_tuple.append(cell.value)
+        #             user_list.append(user_tuple)
+        #         #========================================================#
 
-            # To reflect add, update, remove user... delete all in this group
-            GroupUser.objects.filter(group_id=group_id).delete()
-            
-            #========================================================#
-            # Create Group Users in this Group                       #
-            #========================================================#
-            for user in user_list:
-                group_user_data = {
-                    "group": group_id,
-                    "name": user[0],
-                    "email": user[1]
-                }
-                group_user = GroupUserSerializer(data=group_user_data)
-                if group_user.is_valid():
-                    group_user.save()
-                else:
-                    return self.error("Create group user data is not valid")
-            #========================================================#
-        except:
-            return self.error("cannot create Clipping Group users")
+        #         # To reflect add, update, remove user... delete all in this group
+        #         GroupUser.objects.filter(group_id=group_id).delete()
+                
+        #         #========================================================#
+        #         # Create Group Users in this Group                       #
+        #         #========================================================#
+        #         for user in user_list:
+        #             group_user_data = {
+        #                 "group": group_id,
+        #                 "name": user[0],
+        #                 "email": user[1]
+        #             }
+        #             group_user = GroupUserSerializer(data=group_user_data)
+        #             if group_user.is_valid():
+        #                 group_user.save()
+        #             else:
+        #                 return self.error("Create group user data is not valid")
+        #         #========================================================#
+        #     except:
+        #         return self.error("cannot create Clipping Group users")
 
         # Create Clipping Group Keyword
         try:
@@ -175,6 +181,7 @@ class ClippingGroupAPI(APIView):
             # Create Group Keywords in this Group                    #
             #========================================================#
             for keyword in data["keywords"]:
+                # print("pass key: " + keyword)
                 group_keyword_data = {
                     "group": group_id,
                     "keyword": keyword
@@ -197,6 +204,7 @@ class ClippingGroupAPI(APIView):
             # Create Group Schedules in this Group                   #
             #========================================================#
             for schedule in data["schedules"]:
+                # print("pass sch: " + schedule)
                 hour = int(schedule[0:2])
                 min = int(schedule[3:5])
                 group_schedule_data = {
@@ -213,3 +221,6 @@ class ClippingGroupAPI(APIView):
             return self.error("cannot create Clipping Group schedules")
         
         return self.success(GroupSerializer(group).data)
+
+    def delete(self, request):
+        group_id = request.Get.get("group_id")
