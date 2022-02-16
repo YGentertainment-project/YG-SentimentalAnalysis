@@ -71,7 +71,7 @@
     <td>
         <div class="row_layout">
             <div style="width:80px;">
-                <select name="hour" id="hour-select" class="form-select">
+                <select name="hour" id="hour-select" class="form-select schedule-hour">
                     <option value="0">00</option>
                     <option value="1">01</option>
                     <option value="2">02</option>
@@ -100,7 +100,7 @@
             </div>
             <span style="margin: 5px 10px 0 5px;">시</span>
             <div style="width:80px;">
-                <select name="minute" id="minute-select" class="form-select">
+                <select name="minute" id="minute-select" class="form-select schedule-minute">
                     <option value="0">00</option>
                     <option value="1">01</option>
                     <option value="2">02</option>
@@ -200,24 +200,23 @@
     //스케줄 관련
     var schedules_list = [];
     var hours = $('.schedule-hour');
-    var 
-	var len = hours.length;
+
+	len = hours.length;
 	if(len > 0) {
 		for(var i = 0; i < len; i++) {
             console.log($($('.schedule-hour')[i]).val());
             schedules_list.push($($('.schedule-hour')[i]).val());
-		}	
+		}
 	}
 
     console.log(schedules_list);
 
-    return;
     var data = {
         "name": group_name,
 	    "keywords": keywords_list,
 	    "collect_date": collect_date,//당일/어제/1주/1달??
 	    // "users": file,//file형태로 전달
-	    "schedules":[times]
+	    "schedules":schedules_list
     }
     $.ajax({
         url: '/clipping/api/clipgroup',
@@ -228,10 +227,37 @@
             alert("저장되었습니다.");
         },
         error: e => {
-            console.log(e);
-            alert(e);
+            console.log(e.responseText);
+            alert(e.responseText);
         },
     })
+ });
+
+
+  //그룹 삭제(api 연결)
+  $("#delete-group").click(function(){
+    if (confirm("삭제하시겠습니까?")) {
+        console.log("그룹 삭제");
+        //그룹 이름
+        var group_name = $('.clicked-group-btn').val();
+        console.log(group_name);
+        var data = {
+            "name": group_name
+        }
+        $.ajax({
+            url: 'clipping/api/clipgroup',
+            type: 'delete',
+            datatype:'json',
+            data: JSON.stringify(data),
+            success: res => {
+                alert("삭제되었습니다.");
+            },
+            error: e => {
+                console.log(e.responseText);
+                alert(e.responseText);
+            },
+        })
+    } 
  });
 
 

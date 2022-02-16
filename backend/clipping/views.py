@@ -74,6 +74,7 @@ class ClippingGroupAPI(APIView):
         Clipping Group Create API
         '''
         data = request.data
+        print(data)
         try:
             # Create Clipping Group
             group_data = []
