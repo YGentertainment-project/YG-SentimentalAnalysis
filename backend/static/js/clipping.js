@@ -195,6 +195,11 @@
 
     //당일 or 어제
     var collect_date = $('.clicked-collect-date-btn').val();
+    if(collect_date=="당일"){
+        collect_date = true;
+    }else if(collect_date=="어제"){
+        collect_date = false;
+    }
     console.log(collect_date);
 
     //스케줄 관련
@@ -219,7 +224,7 @@
 	    "schedules":schedules_list
     }
     $.ajax({
-        url: '/clipping/api/clipgroup',
+        url: '/clipping/clipgroup/',
         type: 'POST',
         datatype:'json',
         data: JSON.stringify(data),
