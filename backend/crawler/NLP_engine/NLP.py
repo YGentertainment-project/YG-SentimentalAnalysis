@@ -1,4 +1,3 @@
-from ast import keyword
 import re
 import os
 import json
@@ -19,6 +18,8 @@ from transformers import PreTrainedTokenizer
 from pymongo.errors import DuplicateKeyError
 from transformers import AutoModelForTokenClassification
 from torch.utils.data import TensorDataset, DataLoader, SequentialSampler
+
+from crawler.scrapy_app.apikey import MONGO_ADDR, MONGO_DB, MONGO_PORT, MONGO_PSWD, MONGO_USER
 
 VOCAB_FILES_NAMES = {"vocab_file": "tokenizer_78b3253a26.model",
                      "vocab_txt": "vocab.txt"}
@@ -52,7 +53,7 @@ SPIECE_UNDERLINE = u'▁'
 
 
 class TextCleaner():
-    def __init__(self, path="./CleaningRule.cfg", verbose=False):
+    def __init__(self, path="./crawler/NLP_engine/CleaningRule.cfg", verbose=False):
         with open(path, encoding='utf-8') as jsonfile:
             self.cfg = json.load(jsonfile)
         if verbose:
@@ -369,7 +370,7 @@ class BertTokenizer(PreTrainedTokenizer):
 
 class NLP_Engine:
     def __init__(self,
-                 ner_model_path='./ner_model',
+                 ner_model_path='./crawler/NLP_engine/ner_model',
                  device="cuda" if torch.cuda.is_available() else "cpu"
                  ) -> None:
         self.ner_model_path = ner_model_path
@@ -539,9 +540,9 @@ def NLP_update(from_date, to_date):
     print(from_date, to_date)
     engine = NLP_Engine()
     cleaner = TextCleaner()
-    connection = pymongo.MongoClient(f'mongodb://ygenter:ygenter@150.230.34.147:27017')
-    raw_data_collection = connection['crawling_tuto']['News']
-    nlp_data_collection = connection['crawling_tuto']['NewsNLP']
+    connection = pymongo.MongoClient(f'mongodb://{MONGO_USER}:{MONGO_PSWD}@{MONGO_ADDR}:{MONGO_PORT}')
+    raw_data_collection = connection[MONGO_DB]['News']
+    nlp_data_collection = connection[MONGO_DB]['NewsNLP']
     cursor = raw_data_collection.find({
         'create_dt': {'$gte': from_date, '$lte': to_date, }
     })
@@ -551,7 +552,7 @@ def NLP_update(from_date, to_date):
             '$lte': to_date,
         }
     })
-    for item in tqdm(cursor, total=total_cnt):
+    for item in cursor:
         sents = [
             cleaner.cleaning_data(sent)[1]
             for sent in item['body'].split('.')
