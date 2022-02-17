@@ -132,14 +132,49 @@ def preview(request):
             return JsonResponse(data={"fail":False, "data": "Clipping Group does not exist"})
         keywords = GroupKeyword.objects.filter(group=group).values()
         keyword_list = [keyword["keyword"] for keyword in keywords]
+        today = datetime.datetime.now()
+        if group.collect_date:
+            from_date = today.replace(hour=0, minute=0, second=0, microsecond=0)
+            to_date = today
+        else:
+            today = today.replace(hour=0, minute=0, second=0, microsecond=0)
+            from_date = today - datetime.timedelta(days=1)
+            to_date = today - datetime.timedelta(microseconds=1)
+        
+        conn = MongoClient(f'mongodb://{MONGO_USER}:{MONGO_PSWD}@{MONGO_ADDR}:{MONGO_PORT}')
+        news_collection = conn[MONGO_DB]['News']
+        
+        date_query = {'create_dt': {'$gte': from_date, '$lt': to_date}}
+        news_list = {}
+        
+        reaction_ko = {
+            'cheer': '응원해요',
+            'congrats': '축하해요',
+            'expect': '기대해요',
+            'like': '좋아요',
+            'sad': '슬퍼요',
+            'surprise': '놀랐어요'
+        }
+        for keyword in keyword_list:
+            cursor = news_collection.find({'$and':[date_query, {'keyword':{'$eq': keyword}}]}).sort('reaction_sum', -1).limit(10)
+            keyword = keyword.replace(' ','-')
+            news_list[keyword] = []
+            news_list[keyword] = list(cursor)
+            for news_item in news_list[keyword]:
+                news_item['reaction_ko'] = {
+                    reaction_ko[reaction_type]:reaction_value 
+                    for reaction_type, reaction_value in news_item['reaction'].items()
+                }
+        keyword_list = [keyword.replace(' ','-') for keyword in keyword_list]
         values = {
             'keywords': keyword_list,
+            'today': today,
+            'from_date': from_date,
+            'to_date': to_date,
+            'news_list': news_list,
             'first_depth' : 'NEWS 클리핑',
             'second_depth': '미리보기',
         }
-        conn = MongoClient(f'mongodb://{MONGO_USER}:{MONGO_PSWD}@{MONGO_ADDR}:{MONGO_PORT}')
-        news_collection = conn[MONGO_DB]['News']
-        news_collection.find({}).limit(10)
         return render(request, 'clipping/preview.html', values)
     except:
         traceback.print_exc()

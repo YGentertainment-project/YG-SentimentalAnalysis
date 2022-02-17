@@ -1,35 +1,69 @@
 <!DOCTYPE html>
 <html lang="ko">
 
-   {% extends 'main.html' %}
+{% extends 'main.html' %}
 
-   {% block content %}
-    <div class="forms">
-      <div class="row_layout" style="justify-content: space-between;">
-        <div class="column_layout" style="text-align: start;">
-          <span id="preview_title" style="font-size: 14px;"></span>
-          <span style="font-weight: bold; font-size: 14px;">키워드를 선택하세요</span>
-        </div>
-        <button class="btn btn-primary" style="margin-top: 10px; font-weight: bold;">바로 발송</button>
-      </div>
-        
-
-        <div class="tabmenu" style="overflow-x: scroll; width: 100%; white-space:nowrap;">
-            <ul>
-              {% if keywords %}
-                    {% for keyword in keywords %}
-                    <li id="tab{{keyword}}" class="btnCon keyword-tab">
-                      <input type="radio" name="tabmenu">
-                      <label>{{keyword}}</label>
-                    
-                    </li>
-                    {% endfor %}
-                    {% else %}
-                    {% endif %}
-            </ul>
-        </div>
+{% block content %}
+<div class="forms">
+  <div class="row_layout" style="justify-content: space-between;">
+    <div class="column_layout" style="text-align: start;">
+      <span id="preview_title" style="font-size: 16px;">{{today|date:'Y년 m월 d일'}} 뉴스 클리핑</span>
+      <span id="preview_period"
+        style="font-size: 12px;">{{from_date|date:'Y-m-d H:i'}}~{{to_date|date:'Y-m-d H:i'}}</span>
     </div>
+    <button class="btn btn-primary" style="margin-top: 10px; font-weight: bold;">바로 발송</button>
+  </div>
 
-   {% endblock content %}
+  <nav>
+    <div class="nav nav-tabs mb-4" id="nav-tab" role="tablist">
+      {% if keywords %}
+      {% for keyword in keywords %}
+      <a class="nav-item nav-link" id="nav-home-tab" data-bs-toggle="tab" href="#nav-{{keyword}}" role="tab"
+        aria-controls="nav-{{keyword}}" aria-selected="true">{{keyword}}</a>
+      {% endfor %}
+      {% else %}
+      {% endif %}
+    </div>
+  </nav>
+  <div class="tab-content w-100">
+    {% if news_list %}
+    {% for news_keyword, news_items in news_list.items %}
+    <div id="nav-{{news_keyword}}" class="tab-pane fade" aria-labelledby="nav-{{news_keyword}}-tab" role="tabpanel">
+      <div class="row row-cols-2">
+        {% if news_items|length > 0 %}
+        {% for news in news_items %}
+        <div class="col mb-4">
+          <div class="card text-break">
+            <div class="card-body">
+              <span style="font-size: 16px; font-weight: bold;">{{news.title}}</span>
+              <br>
+              <span style="font-size: 14px;">{{news.press}} {{news.reporter}}</span>
+              <br>
+              <span class="text-black-50" style="font-size: 14px;">
+                {% for reaction_type, reaction_cnt in news.reaction_ko.items %}
+                {{reaction_type}}: {{reaction_cnt}}
+                {% endfor %}
+              </span>
+              {% if news.reaction_ko.items|length > 0 %}
+              <br>
+              {% else %}
+              {% endif %}
+              <span style="font-size: 14px;">{{news.snippet}}</span>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="m-auto text-center" style="font-size: 20px; font-weight: bold;">"{{news_keyword}}" 키워드 관련 뉴스가 없습니다
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    {% endif %}
+  </div>
+
+  {% endblock content %}
 
 </html>
