@@ -75,10 +75,10 @@ class APIView(View):
         return self.response_class.response(data)
 
     def success(self, data=None):
-        return self.response({"error": None, "data": data})
+        return self.response({"success": True, "data": data})
 
     def error(self, msg="error", err="error"):
-        return self.response({"error": err, "data": msg})
+        return self.response({"success": False, "data": msg, "status": 400})
 
     def extract_errors(self, errors, key="field"):
         if isinstance(errors, dict):
