@@ -193,7 +193,7 @@ svg:active g {
   }
   .tabmenu ul li{
     display: inline-block;
-    width: 33.33%;
+    width: 10%;
     text-align:center; 
     background : transparent;
     line-height:40px;
