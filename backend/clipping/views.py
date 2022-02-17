@@ -20,20 +20,23 @@ def base(request):
         '''
         general page
         '''
-        # db연결 필요
-        groups = Group.objects.all()
-        keywords = KeywordGroup.objects.all()
-        print("===groupds====")
-        print(groups)
-        print(keywords)
+        groups = Group.objects.all().values()
+        keywords = KeywordGroup.objects.all().values()
+
+        #========================================================#
+        # Search ALL Keyword Groups for display                  #
+        #========================================================#
+        keyword_list = []
+        for keyword in keywords:
+            keyword_list.append(keyword["groupname"])
+
         values = {
             'groups': groups,
-            'keywords': ['키워드1', '키워드2', '키워드3', '키워드4', '키워드5', '키워드6', '키워드7', '키워드8', '키워드9', '키워드10'
-            , '키워드11', '키워드12', '키워드13', '키워드14', '키워드15', '키워드16', '키워드17', '키워드18'
-            , '키워드19', '키워드20', '키워드21', '키워드22', '키워드23', '키워드24', '키워드25', '키워드26'],
+            'keywords': keyword_list,
             'first_depth' : 'NEWS 클리핑',
             'second_depth': 'NEWS 클리핑',
         }
+
         return render(request, 'clipping/clipping.html', values)
     else:
         type = request.POST['type']
@@ -42,37 +45,91 @@ def base(request):
             export to excel (receiver download)
             '''
             group_id = request.POST.get('group_id', None) #그룹 id
-            book = None
-            # TODO:
-            # 엑셀 파일인 book을 받아와야함
-            # book = export_datareport(excel_export_type, excel_export_start_date, excel_export_end_date)
-            filename = "파일 이름.xlsx" % ()
-            response = HttpResponse(content=save_virtual_workbook(book), content_type='application/vnd.ms-excel')
+            try:
+                group = Group.objects.filter(id=group_id).first()
+            except:
+                return JsonResponse(data={"success":False, "data": "Clipping Group does not exist"})
+            group_name = getattr(group, "name")
+
+            wb = openpyxl.Workbook()
+            sheet = wb.active
+
+            #========================================================#
+            # Search Group User list of this group                   #
+            #========================================================#
+            users = GroupUser.objects.filter(group_id=group_id).values()
+            user_list = []
+            email_list = []
+
+            for user in users:
+                user_list.append(user["name"])
+                email_list.append(user["email"])
+
+            #========================================================#
+            # Make User list Excel sheet                             #
+            #========================================================#
+            i=1
+            for ii, name in enumerate(user_list):
+                sheet["A"+str(i)] = name
+                sheet["B"+str(i)] = email_list[ii]
+                i+=1
+
+            filename = "%s USER LIST.xlsx" % (group_name)
+            response = HttpResponse(content=save_virtual_workbook(wb), content_type='application/vnd.ms-excel')
             response['Content-Disposition'] = 'attachment; filename='+filename
             return response
         elif type == 'keyword_download':
             '''
             export to excel (keyword download)
             '''
-            # group_id = request.POST.get('group_id', None) #그룹 id
-            # book = None
-            # # 엑셀 파일인 book을 받아와야함
-            # # book = export_datareport(excel_export_type, excel_export_start_date, excel_export_end_date)
-            # filename = "파일 이름.xlsx" % ()
-            # response = HttpResponse(content=save_virtual_workbook(book), content_type='application/vnd.ms-excel')
-            # response['Content-Disposition'] = 'attachment; filename='+filename
-            # return response
-
-
+            print("export to excel (keyword download)")
+            try:
+                keyword_groups = KeywordGroup.objects.all()
+                keywords = Keyword.objects.all()
+                if keyword_groups.exists():
+                    keyword_table = {}
+                    for keyword_group in keyword_groups:
+                        keyword_table[keyword_group.groupname] = []
+                    for keyword in keywords:
+                        keyword_table[keyword.keywordgroup.groupname].append(keyword.keyword)
+                    max_column = max([len(keywords) for _, keywords in keyword_table.items()])
+                    print(keyword_table.items())
+                    new_wb = openpyxl.Workbook()
+                    new_ws = new_wb.active
+                    new_ws.cell(1, 1, '키워드')
+                    for col in range(2, max_column + 1):
+                        new_ws.cell(1, col, f'동의어{col - 1}')
+                    new_ws.cell(1, max_column + 1, '종류')
+                    for idx1, keyword_group in enumerate(keyword_groups):
+                        groupname = keyword_group.groupname
+                        new_ws.cell(idx1 + 2, 1, groupname)
+                        for idx2, synonym in enumerate(keyword_table[groupname][1:]):
+                            new_ws.cell(idx1 + 2, idx2 + 2, synonym)
+                        new_ws.cell(idx1 + 2, max_column + 1, keyword_group.type)
+                    filename = 'Keyword.xlsx'
+                    file_response = HttpResponse(
+                        save_virtual_workbook(new_wb),
+                        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                    )
+                    file_response['Content-Disposition'] = f'attachment;filename*=UTF-8\'\'{filename}'
+                    return file_response
+                else:
+                    return request.success()
+            except Exception as e:
+                return request.error("Keyword Group does not exist")
 
 
 def preview(request):
     '''
     preview page
     '''
-    # db연결 필요
+    keywords = KeywordGroup.objects.all().values()
+
+    keyword_list = []
+    for keyword in keywords:
+        keyword_list.append(keyword["groupname"])
     values = {
-        'keywords': ['키워드1', '키워드2', '키워드3', '키워드4'],
+        'keywords': keyword_list,
         'first_depth' : 'NEWS 클리핑',
         'second_depth': '미리보기',
     }
@@ -115,7 +172,8 @@ class KeywordExcelAPI(APIView):
                     keyword_table[keyword_group.groupname] = []
                 for keyword in keywords:
                     keyword_table[keyword.keywordgroup.groupname].append(keyword.keyword)
-                max_column = max([len(keywords) for keywords in keyword_table.items()])
+                max_column = max([len(keywords) for _, keywords in keyword_table.items()])
+                print(keyword_table.items())
                 new_wb = openpyxl.Workbook()
                 new_ws = new_wb.active
                 new_ws.cell(1, 1, '키워드')
@@ -167,7 +225,6 @@ class KeywordExcelAPI(APIView):
             row += 1
         Keyword.objects.all().delete()
         KeywordGroup.objects.all().delete()
-        print(keyword_table)
         for keyword_group in keyword_table:
             group_item = KeywordGroup.objects.create(
                 groupname = keyword_group,
@@ -180,7 +237,7 @@ class KeywordExcelAPI(APIView):
                     keywordgroup = group_item,
                     keyword = keyword
                 )
-        return self.success()
+        return self.success(keyword_table)
 
 
 class ClippingGroupAPI(APIView):
@@ -197,23 +254,29 @@ class ClippingGroupAPI(APIView):
         except:
             return self.error("Clipping Group does not exist")
         
-        # total_keywords = GroupKeyword.objects.all().values()
-        # print(total_keywords)
+        #========================================================#
+        # Search Group Keyword List for this group               #
+        #========================================================#
         check_list = []
         checked_keywords = GroupKeyword.objects.filter(group_id=group_id).values()
         for key in checked_keywords:
             check_list.append(key["keyword"])
-        print(check_list)
 
+        #========================================================#
+        # Search Group schedule List for this group               #
+        #========================================================#
         schedule_list = []
         schedules = GroupSchedule.objects.filter(group_id = group_id).values()
         for key in schedules:
             schedule_list.append(key["time"])
-        print(schedule_list)
-        
+
+        #========================================================#
+        # Make Response data                                     #
+        #========================================================#
         if group:
             res_data = {}
             res_data["name"] = getattr(group, "name")
+            res_data["collect_date"] = getattr(group, "collect_date")
             # data["total_keywords"] = total_keywords
             res_data["checked_keywords"] = check_list
             res_data["schedule"] = schedule_list
@@ -227,9 +290,12 @@ class ClippingGroupAPI(APIView):
         Clipping Group Create/Update API
         '''
         data = request.POST
+        create_user_flag = False
+
         # 'not in data' means 'in FILES', so there is an attached file
         if 'users' not in data:
             file = request.FILES['users']
+            create_user_flag = True
         
         data = json.loads(data['body'])
         # data = JSONParser(data)
@@ -240,7 +306,6 @@ class ClippingGroupAPI(APIView):
                 "name": data["name"],
                 "collect_date": data["collect_date"]
             }
-            print(group_data)
             exist_data = Group.objects.filter(name=data["name"]).first()
             #========================================================#
             # Create new Group if there are not same name group      #
@@ -259,15 +324,16 @@ class ClippingGroupAPI(APIView):
                 group = GroupSerializer(exist_data, data=group_data)
                 if group.is_valid():
                     group.save()
+                    print(data["collect_date"])
                 else:
                     return self.error("Update clipping group data is not valid")
         except:
             return self.error("cannot create Clipping Group")
         
         group_id = group.data["id"]
-
+        
         # Create Clipping Group Users
-        if "users" not in data:
+        if create_user_flag:
             try:
                 #========================================================#
                 # Load Excel for external User List...                   #
@@ -308,7 +374,7 @@ class ClippingGroupAPI(APIView):
                 #========================================================#
             except:
                 return self.error("cannot create Clipping Group users")
-        print("user pass")
+        
         # Create Clipping Group Keyword
         try:
             # To reflect add, update, remove keyword... delete all in this group
@@ -331,7 +397,7 @@ class ClippingGroupAPI(APIView):
             #========================================================#
         except:
             return self.error("cannot create Clipping Group keywords")
-        print("keyword pass")
+        
         # Create Clipping Group Schedule
         try:
             # To reflect add, update, remove schedule... delete all in this group
@@ -356,6 +422,7 @@ class ClippingGroupAPI(APIView):
             #========================================================#
         except:
             return self.error("cannot create Clipping Group schedules")
+
         return JsonResponse(data={"success":True})
         return self.success(GroupSerializer(group).data)
 

@@ -64,6 +64,7 @@ function getTime(minutes, seconds) {
         $("#group_content").removeClass("hide");
         //content 보여줄 때 해당 그룹이름과 맞게 가져오기
         getKeywordOfGroup($(widget).attr('id'));
+        $('#receiver_download_group_id').val($(widget).attr('id'));
     }
     $("#receiver-upload").val("");
  }
@@ -148,6 +149,7 @@ function getNewKeywordOfGroup(){
     for(var i=0; i<1; i++){
         add_schedule_function();
     }
+    $('#receiver_download_group_id').val("");
 }
 
 //키워드 버튼 누르면 변하도록
@@ -375,6 +377,8 @@ $("#save-group").click(function(){
     // 다른 parameter들은 body에 묶어 보내기
     let body = JSON.stringify(data);
     formData.append("body", JSON.stringify(data));
+    console.log("===formData===");
+    console.log(formData);
     $.ajax({
         url: '/clipping/clipgroup/',
         data: formData,
@@ -442,6 +446,43 @@ $("#save-group").click(function(){
         })
     } 
  });
+
+//키워드: 엑셀 업로드 버튼 클릭
+$('#keyword-uplaod-btn').click(function (){
+    let file = document.getElementById("keyword-upload").files[0];
+    if(file == undefined){
+        alert("키워드 파일을 선택해주세요.");
+        return;
+    }
+    let formData = new FormData(); 
+    formData.append("KeywordFile", file);
+    $.ajax({
+        url: '/clipping/keyword-group/',
+        data: formData,
+        type: 'POST',
+        contentType: false,
+        processData: false,
+        success: res => {
+            alert("저장되었습니다.");
+        },
+        error: e => {
+            console.log(e.responseText);
+            if(e.responseText["data"] != null)
+                alert(e.responseText["data"]);
+            else
+                alert(e.responseText);
+        },
+    });
+});
+
+document.querySelector("#receiver-download-btn").addEventListener("click", function(event) {
+    //그룹이 저장되지 않은 상태에서 엑셀 다운로드 방지
+    var group_id = $('.clicked-group-btn').attr('id');
+    if(group_id == -1){
+        alert("그룹을 먼저 저장한 후에 엑셀 다운로드를 할 수 있습니다.");
+        event.preventDefault();
+    }
+}, false);
 
 
 //미리보기 화면으로 이동
