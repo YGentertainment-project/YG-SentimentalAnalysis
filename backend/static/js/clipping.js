@@ -488,9 +488,10 @@ document.querySelector("#receiver-download-btn").addEventListener("click", funct
 //미리보기 화면으로 이동
 $("#go-to-preview").click(function(){
      //지금 눌려있는 애가 새로운 아이라면
-     if($('.clicked-group-btn').attr('id') == -1){
+    if($('.clicked-group-btn').attr('id') == -1){
         alert("먼저 새로운 그룹 저장을 해주세요.");
         return;
     }
-    location.href = "/clipping/preview/";
+    group_id = $('.clicked-group-btn').attr('id');
+    location.href = "/clipping/preview?group_id="+group_id;
 });

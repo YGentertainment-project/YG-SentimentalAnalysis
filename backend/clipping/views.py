@@ -1,16 +1,18 @@
 from distutils.command import check
 import os
 import json
-import datetime 
+import datetime
+import traceback 
 import openpyxl
+from pymongo import MongoClient
+from openpyxl import load_workbook
 from openpyxl.writer.excel import save_virtual_workbook
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from clipping.serializers import GroupKeywordSerializer, GroupScheduleSerializer, GroupSerializer, GroupUserSerializer
 from utils.api import APIView, validate_serializer
 from .models import Keyword, KeywordGroup, Group, GroupKeyword, GroupSchedule, GroupUser
-from rest_framework.parsers import JSONParser
-from openpyxl import load_workbook
+from crawler.scrapy_app.apikey import *
 
 def base(request):
     '''
@@ -123,17 +125,25 @@ def preview(request):
     '''
     preview page
     '''
-    keywords = KeywordGroup.objects.all().values()
-
-    keyword_list = []
-    for keyword in keywords:
-        keyword_list.append(keyword["groupname"])
-    values = {
-        'keywords': keyword_list,
-        'first_depth' : 'NEWS 클리핑',
-        'second_depth': '미리보기',
-    }
-    return render(request, 'clipping/preview.html', values)
+    try:
+        group_id = request.GET['group_id']
+        group = Group.objects.filter(id=group_id).first()
+        if group is None:
+            return JsonResponse(data={"fail":False, "data": "Clipping Group does not exist"})
+        keywords = GroupKeyword.objects.filter(group=group).values()
+        keyword_list = [keyword["keyword"] for keyword in keywords]
+        values = {
+            'keywords': keyword_list,
+            'first_depth' : 'NEWS 클리핑',
+            'second_depth': '미리보기',
+        }
+        conn = MongoClient(f'mongodb://{MONGO_USER}:{MONGO_PSWD}@{MONGO_ADDR}:{MONGO_PORT}')
+        news_collection = conn[MONGO_DB]['News']
+        news_collection.find({}).limit(10)
+        return render(request, 'clipping/preview.html', values)
+    except:
+        traceback.print_exc()
+        return JsonResponse(data={"success":False, "data": "Internal Server Error"})
 
 class KeywordAPI(APIView):
     def get(self, request):
@@ -294,7 +304,8 @@ class ClippingGroupAPI(APIView):
         }
         RESPONSE FORMAT:
         {
-            "success": True/False (boolean)
+            "success": True/False (boolean),
+            "group": 생성된 그룹의 group_id (int)
         }
         '''
         data = request.POST
@@ -432,7 +443,7 @@ class ClippingGroupAPI(APIView):
         except:
             return self.error("cannot create Clipping Group schedules")
 
-        return JsonResponse(data={"success":True})
+        return JsonResponse(data={"success":True, "group": group_id})
 
     def delete(self, request):
         """
