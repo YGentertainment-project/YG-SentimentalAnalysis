@@ -183,6 +183,7 @@ class ClippingGroupAPI(APIView):
         #========================================================#
         if group:
             res_data = {}
+            res_data["id"] = group_id
             res_data["name"] = getattr(group, "name")
             res_data["collect_date"] = getattr(group, "collect_date")
             # data["total_keywords"] = total_keywords
@@ -199,8 +200,8 @@ class ClippingGroupAPI(APIView):
         '''
         data = JSONParser().parse(request)
         # print(data)
-        # if data["users"]:
-        #     file = request.FILES['file_excel']
+        if data["users"]:
+            file = request.FILES['file_excel']
 
         try:
             # Create Clipping Group
@@ -229,7 +230,6 @@ class ClippingGroupAPI(APIView):
                     group.save()
                 else:
                     return self.error("Update clipping group data is not valid")
-            #========================================================#
         except:
             return self.error("cannot create Clipping Group")
 
@@ -324,7 +324,7 @@ class ClippingGroupAPI(APIView):
         except:
             return self.error("cannot create Clipping Group schedules")
 
-        return JsonResponse(data={"success":True})
+        return JsonResponse(data={"success":True, "group":group_id})
         return self.success(GroupSerializer(group).data)
 
     def delete(self, request):
