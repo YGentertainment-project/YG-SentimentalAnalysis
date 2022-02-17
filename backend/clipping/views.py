@@ -143,6 +143,7 @@ class KeywordExcelAPI(APIView):
                 )
         return self.success()
 
+
 class ClippingGroupAPI(APIView):
     def get(self, request):
         '''
@@ -192,16 +193,15 @@ class ClippingGroupAPI(APIView):
             return JsonResponse(data={"success":True, "data": res_data})
         else:
             return self.error("Request does not have any group name")
-        
-    
+
     def post(self, request):
         '''
         Clipping Group Create/Update API
         '''
         data = JSONParser().parse(request)
         # print(data)
-        if data["users"]:
-            file = request.FILES['file_excel']
+        # if data["users"]:
+        #     file = request.FILES['users']
 
         try:
             # Create Clipping Group
@@ -324,8 +324,17 @@ class ClippingGroupAPI(APIView):
         except:
             return self.error("cannot create Clipping Group schedules")
 
-        return JsonResponse(data={"success":True, "group":group_id})
+        return JsonResponse(data={"success":True})
         return self.success(GroupSerializer(group).data)
 
     def delete(self, request):
         group_id = request.Get.get("group_id")
+        if not group_id:
+            return self.error()
+
+        GroupKeyword.objects.filter(group_id=group_id).delete()
+        GroupSchedule.objects.filter(group_id=group_id).delete()
+        GroupUser.objects.filter(group_id=group_id).delete()
+        Group.objects.filter(group_id=group_id).delete()
+
+        return JsonResponse(data={"success":True})
