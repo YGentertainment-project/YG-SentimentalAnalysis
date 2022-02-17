@@ -330,8 +330,10 @@ class ClippingGroupAPI(APIView):
         return self.success(GroupSerializer(group).data)
 
     def delete(self, request):
+        print(request.GET)
         group_id = request.GET.get("group_id")
-        if not group_id:
+        print(group_id)
+        if group_id is None:
             return self.error("Group id does not exist")
 
         GroupKeyword.objects.filter(group_id=group_id).delete()
