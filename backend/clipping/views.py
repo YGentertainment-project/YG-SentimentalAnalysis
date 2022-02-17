@@ -18,6 +18,8 @@ def base(request):
     # db연결 필요
     groups = Group.objects.all()
     keywords = KeywordGroup.objects.all()
+    print("===groupds====")
+    print(groups)
     print(keywords)
     values = {
         'groups': groups,

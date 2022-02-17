@@ -369,7 +369,13 @@ $("#save-group").click(function(){
     }
     console.log(data);
     var len = $(".clicked-group-btn").length;
-    
+    let file = document.getElementById("receiver-download").files[0];
+    console.log(file);
+let formData = new FormData();
+     
+formData.append("photo", photo);
+console.log(formData);
+// fetch('/upload/image', {method: "POST", body: formData});
     $.ajax({
         url: '/clipping/clipgroup/',
         type: 'POST',
