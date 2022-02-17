@@ -27,7 +27,8 @@ function getTime(minutes, seconds) {
 
  $("#add-group-form-save").click(function(){
     // 저장 후 팝업 닫기
-    let newButton = $('<input class="group-btn" type="button" value="'+$("#new_group_name").val()+'"></input>');
+    //새로 생겼다는 의미로 id -1 넣어두기
+    let newButton = $('<input class="group-btn" type="button" value="'+$("#new_group_name").val()+'" id="'+-1+'"></input>');
     newButton.click(function(){
         click_group_function(newButton);
     });
@@ -57,17 +58,18 @@ function getTime(minutes, seconds) {
         $(".group-btn").not($(widget)).removeClass("clicked-group-btn"); 
         $("#group_content").removeClass("hide");
         //content 보여줄 때 해당 그룹이름과 맞게 가져오기
-        console.log($(widget).val());
-        getKeywordOfGroup($(widget).val());
+        console.log("===id=====");
+        console.log($(widget).attr('id'));
+        getKeywordOfGroup($(widget).attr('id'));
     }
  }
 
-function getKeywordOfGroup(group_name){
+function getKeywordOfGroup(group_id){
     //TODO: get api 연결
     //일단 dummy data로 연결하기
     $.ajax({
         url: '/clipping/clipgroup/?' + $.param({
-            group: group_name
+            group_id: group_id
         }),
         type: 'GET',
         datatype: 'json',

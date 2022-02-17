@@ -25,7 +25,7 @@
                 <div class="row_layout child-margin-5" id="groups">
                     {% if groups %}
                     {% for group in groups %}
-                        <input type="button" class="group-btn" value="{{group.name}}">
+                        <input type="button" class="group-btn" value="{{group.name}}" id="{{group.id}}">
                     {% endfor %}
                     {% else %}
                     {% endif %}
