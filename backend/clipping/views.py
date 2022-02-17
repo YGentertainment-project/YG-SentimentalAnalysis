@@ -200,8 +200,8 @@ class ClippingGroupAPI(APIView):
         '''
         data = JSONParser().parse(request)
         # print(data)
-        if data["users"]:
-            file = request.FILES['file_excel']
+        # if data["users"]:
+        #     file = request.FILES['file_excel']
 
         try:
             # Create Clipping Group
