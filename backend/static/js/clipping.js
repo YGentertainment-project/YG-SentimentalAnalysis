@@ -445,6 +445,34 @@ $("#save-group").click(function(){
     } 
  });
 
+//키워드: 엑셀 업로드 버튼 클릭
+$('#keyword-uplaod-btn').click(function (){
+    let file = document.getElementById("keyword-upload").files[0];
+    if(file == undefined){
+        alert("키워드 파일을 선택해주세요.");
+        return;
+    }
+    let formData = new FormData(); 
+    formData.append("KeywordFile", file);
+    $.ajax({
+        url: '/clipping/keyword-group/',
+        data: formData,
+        type: 'POST',
+        contentType: false,
+        processData: false,
+        success: res => {
+            alert("저장되었습니다.");
+        },
+        error: e => {
+            console.log(e.responseText);
+            if(e.responseText["data"] != null)
+                alert(e.responseText["data"]);
+            else
+                alert(e.responseText);
+        },
+    });
+});
+
 
 //미리보기 화면으로 이동
 $("#go-to-preview").click(function(){

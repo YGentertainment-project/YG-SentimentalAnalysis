@@ -20,7 +20,6 @@ def base(request):
         '''
         general page
         '''
-        # db연결 필요
         groups = Group.objects.all().values()
         keywords = KeywordGroup.objects.all().values()
 
@@ -28,8 +27,6 @@ def base(request):
         for keyword in keywords:
             keyword_list.append(keyword["groupname"])
 
-        print(groups)
-        print(keyword_list)
         values = {
             'groups': groups,
             'keywords': keyword_list,
@@ -48,7 +45,6 @@ def base(request):
                 group = Group.objects.filter(id=group_id).first()
             except:
                 return JsonResponse(data={"success":False, "data": "Clipping Group does not exist"})
-            
             wb = openpyxl.Workbook()
             sheet = wb.active
 
@@ -60,15 +56,12 @@ def base(request):
             for user in users:
                 user_list.append(user["name"])
                 email_list.append(user["email"])
-            
             i=1
-            for name, email in user_list, email_list:
+            for ii, name in enumerate(user_list):
                 sheet["A"+str(i)] = name
-                sheet["B"+str(i)] = email
+                sheet["B"+str(i)] = email_list[ii]
                 i+=1
-
             filename = "%s USER LIST.xlsx" % (group_name)
-            # print(filename)
             response = HttpResponse(content=save_virtual_workbook(wb), content_type='application/vnd.ms-excel')
             response['Content-Disposition'] = 'attachment; filename='+filename
             return response
@@ -92,9 +85,13 @@ def preview(request):
     '''
     preview page
     '''
-    # db연결 필요
+    keywords = KeywordGroup.objects.all().values()
+
+    keyword_list = []
+    for keyword in keywords:
+        keyword_list.append(keyword["groupname"])
     values = {
-        'keywords': ['키워드1', '키워드2', '키워드3', '키워드4'],
+        'keywords': keyword_list,
         'first_depth' : 'NEWS 클리핑',
         'second_depth': '미리보기',
     }
