@@ -16,21 +16,55 @@ def base(request):
     '''
     general page
     '''
-    # db연결 필요
-    groups = Group.objects.all()
-    keywords = KeywordGroup.objects.all()
-    print("===groupds====")
-    print(groups)
-    print(keywords)
-    values = {
-        'groups': groups,
-        'keywords': ['키워드1', '키워드2', '키워드3', '키워드4', '키워드5', '키워드6', '키워드7', '키워드8', '키워드9', '키워드10'
-        , '키워드11', '키워드12', '키워드13', '키워드14', '키워드15', '키워드16', '키워드17', '키워드18'
-        , '키워드19', '키워드20', '키워드21', '키워드22', '키워드23', '키워드24', '키워드25', '키워드26'],
-        'first_depth' : 'NEWS 클리핑',
-        'second_depth': 'NEWS 클리핑',
-    }
-    return render(request, 'clipping/clipping.html', values)
+    if request.method == 'GET':
+        '''
+        general page
+        '''
+        # db연결 필요
+        groups = Group.objects.all()
+        keywords = KeywordGroup.objects.all()
+        print("===groupds====")
+        print(groups)
+        print(keywords)
+        values = {
+            'groups': groups,
+            'keywords': ['키워드1', '키워드2', '키워드3', '키워드4', '키워드5', '키워드6', '키워드7', '키워드8', '키워드9', '키워드10'
+            , '키워드11', '키워드12', '키워드13', '키워드14', '키워드15', '키워드16', '키워드17', '키워드18'
+            , '키워드19', '키워드20', '키워드21', '키워드22', '키워드23', '키워드24', '키워드25', '키워드26'],
+            'first_depth' : 'NEWS 클리핑',
+            'second_depth': 'NEWS 클리핑',
+        }
+        return render(request, 'clipping/clipping.html', values)
+    else:
+        type = request.POST['type']
+        if type == 'receiver_download':
+            '''
+            export to excel (receiver download)
+            '''
+            group_id = request.POST.get('group_id', None) #그룹 id
+            book = None
+            # TODO:
+            # 엑셀 파일인 book을 받아와야함
+            # book = export_datareport(excel_export_type, excel_export_start_date, excel_export_end_date)
+            filename = "파일 이름.xlsx" % ()
+            response = HttpResponse(content=save_virtual_workbook(book), content_type='application/vnd.ms-excel')
+            response['Content-Disposition'] = 'attachment; filename='+filename
+            return response
+        elif type == 'keyword_download':
+            '''
+            export to excel (keyword download)
+            '''
+            # group_id = request.POST.get('group_id', None) #그룹 id
+            # book = None
+            # # 엑셀 파일인 book을 받아와야함
+            # # book = export_datareport(excel_export_type, excel_export_start_date, excel_export_end_date)
+            # filename = "파일 이름.xlsx" % ()
+            # response = HttpResponse(content=save_virtual_workbook(book), content_type='application/vnd.ms-excel')
+            # response['Content-Disposition'] = 'attachment; filename='+filename
+            # return response
+
+
+
 
 def preview(request):
     '''

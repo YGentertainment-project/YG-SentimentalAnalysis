@@ -45,8 +45,18 @@
             </div>
 
             <div class="row_layout child-margin-5" style="justify-content: flex-end; align-items: flex-end; margin-right: 1%; ">
-                <input type="button" class="group-btn" value="엑셀 업로드">
-                <input type="button" class="group-btn" value="엑셀 다운로드">
+                <span style="font-weight: bold;">키워드 관리 관련</span>
+
+                <form method="post" action="{%url 'clipping:base' %}" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="text" name="filename" value="login_form" style="display:none;">
+                    <input type="text" name="type" value="export_form" style="display:none;">
+                    <button class="border-btn"
+                    type="submit" style="font-size: 10px !important;">양식 업로드</button>
+                </form>
+    
+                <input type="button" class="border-btn" value="엑셀 업로드">
+                <input type="button" class="border-btn" value="엑셀 다운로드">
                 <button id="save-group" class="btn btn-primary"
                     style="font-size: 10px !important; font-weight: bold;">저장</button>
                 <button id="delete-group" class="btn btn-danger"
