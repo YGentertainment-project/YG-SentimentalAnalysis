@@ -374,7 +374,7 @@ $("#save-group").click(function(){
     formData.append("users", file);
     // 다른 parameter들은 body에 묶어 보내기
     let body = JSON.stringify(data);
-    formData.append("body", body);
+    formData.append("body", JSON.stringify(data));
     $.ajax({
         url: '/clipping/clipgroup/',
         data: formData,
@@ -405,6 +405,12 @@ $("#save-group").click(function(){
         alert("삭제할 그룹을 선택해주세요.");
     }
     else if (confirm("삭제하시겠습니까?")) {
+        //db저장이 아닌 프론트에만 있는 것이기 때문에 서버에 전달 안하고 삭제
+        if(group_id == -1){
+            alert("삭제되었습니다.");
+            location.reload();
+            return;
+        }
         var data = {
             "group_id": group_id
         };
@@ -440,5 +446,10 @@ $("#save-group").click(function(){
 
 //미리보기 화면으로 이동
 $("#go-to-preview").click(function(){
+     //지금 눌려있는 애가 새로운 아이라면
+     if($('.clicked-group-btn').attr('id') == -1){
+        alert("먼저 새로운 그룹 저장을 해주세요.");
+        return;
+    }
     location.href = "/clipping/preview/";
 });
