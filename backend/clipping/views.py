@@ -69,16 +69,41 @@ def base(request):
             '''
             export to excel (keyword download)
             '''
-            # group_id = request.POST.get('group_id', None) #그룹 id
-            # book = None
-            # # 엑셀 파일인 book을 받아와야함
-            # # book = export_datareport(excel_export_type, excel_export_start_date, excel_export_end_date)
-            # filename = "파일 이름.xlsx" % ()
-            # response = HttpResponse(content=save_virtual_workbook(book), content_type='application/vnd.ms-excel')
-            # response['Content-Disposition'] = 'attachment; filename='+filename
-            # return response
-
-
+            print("export to excel (keyword download)")
+            try:
+                keyword_groups = KeywordGroup.objects.all()
+                keywords = Keyword.objects.all()
+                if keyword_groups.exists():
+                    keyword_table = {}
+                    for keyword_group in keyword_groups:
+                        keyword_table[keyword_group.groupname] = []
+                    for keyword in keywords:
+                        keyword_table[keyword.keywordgroup.groupname].append(keyword.keyword)
+                    max_column = max([len(keywords) for _, keywords in keyword_table.items()])
+                    print(keyword_table.items())
+                    new_wb = openpyxl.Workbook()
+                    new_ws = new_wb.active
+                    new_ws.cell(1, 1, '키워드')
+                    for col in range(2, max_column + 1):
+                        new_ws.cell(1, col, f'동의어{col - 1}')
+                    new_ws.cell(1, max_column + 1, '종류')
+                    for idx1, keyword_group in enumerate(keyword_groups):
+                        groupname = keyword_group.groupname
+                        new_ws.cell(idx1 + 2, 1, groupname)
+                        for idx2, synonym in enumerate(keyword_table[groupname][1:]):
+                            new_ws.cell(idx1 + 2, idx2 + 2, synonym)
+                        new_ws.cell(idx1 + 2, max_column + 1, keyword_group.type)
+                    filename = 'Keyword.xlsx'
+                    file_response = HttpResponse(
+                        save_virtual_workbook(new_wb),
+                        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                    )
+                    file_response['Content-Disposition'] = f'attachment;filename*=UTF-8\'\'{filename}'
+                    return file_response
+                else:
+                    return request.success()
+            except Exception as e:
+                return request.error("Keyword Group does not exist")
 
 
 def preview(request):
