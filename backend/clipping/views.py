@@ -199,40 +199,29 @@ class ClippingGroupAPI(APIView):
         
         # total_keywords = GroupKeyword.objects.all().values()
         # print(total_keywords)
-
-        #========================================================#
-        # Make this group's keyword list                         #
-        #========================================================#
         check_list = []
         checked_keywords = GroupKeyword.objects.filter(group_id=group_id).values()
         for key in checked_keywords:
             check_list.append(key["keyword"])
-        # print(check_list)
+        print(check_list)
 
-        #========================================================#
-        # Make this group's schedule list                        #
-        #========================================================#
         schedule_list = []
         schedules = GroupSchedule.objects.filter(group_id = group_id).values()
         for key in schedules:
             schedule_list.append(key["time"])
-        # print(schedule_list)
+        print(schedule_list)
         
-        #========================================================#
-        # Create and Return response data                        #
-        #========================================================#
         if group:
             res_data = {}
-            res_data["id"] = group_id
             res_data["name"] = getattr(group, "name")
-            res_data["collect_date"] = getattr(group, "collect_date")
             # data["total_keywords"] = total_keywords
             res_data["checked_keywords"] = check_list
             res_data["schedule"] = schedule_list
             return JsonResponse(data={"success":True, "data": res_data})
         else:
             return self.error("Request does not have any group name")
-
+        
+    
     def post(self, request):
         '''
         Clipping Group Create/Update API
@@ -367,7 +356,6 @@ class ClippingGroupAPI(APIView):
             #========================================================#
         except:
             return self.error("cannot create Clipping Group schedules")
-        print("sche pass")
         return JsonResponse(data={"success":True})
         return self.success(GroupSerializer(group).data)
 
