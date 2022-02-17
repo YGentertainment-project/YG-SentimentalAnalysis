@@ -141,29 +141,6 @@ class KeywordAPI(APIView):
         Keyword list read API
         '''
         try:
-            keywords = Keyword.objects.all()
-            if keywords.exists():
-                keyword_list = keywords.values()
-                data = []
-                for entry in keyword_list:
-                    data.append(entry)
-                return self.success(data)
-            else:
-                return self.success()
-        except:
-            return self.error("Keyword does not exist")
-
-    def post(self, request):
-        '''
-        Keyword list Excel Import
-        '''
-
-class KeywordExcelAPI(APIView):
-    def get(self, request):
-        '''
-        Keyword list read API
-        '''
-        try:
             keyword_groups = KeywordGroup.objects.all()
             keywords = Keyword.objects.all()
             if keyword_groups.exists():
@@ -240,10 +217,27 @@ class KeywordExcelAPI(APIView):
         return self.success(keyword_table)
 
 
+# CLippingGroupAPI
+# CRUD NEWS Clipping Groups by using 
+# | get: Read Clipping Groups
+# | post: Create/Update Clipping Groups
+# | delete: Delete Clipping Groups
+# Author: 최영우, cyw7515@naver.com
 class ClippingGroupAPI(APIView):
     def get(self, request):
         '''
-        Clipping Group Read API
+        Read Clipping Group API
+        REQUEST FORMAT:
+        {
+            "group_id": group_id (num)
+        }
+        RESPONSE FORMAT:
+        {
+            "name": group_name(str),
+            "collect_date": 수집기간(T:당일, F:어제) (boolean),
+            "checked_keywords": 선택한 키워드 목록 (str list),
+            "schedules": 수집시기 (datetime list),
+        }
         '''
         group_id = request.GET.get("group_id")
         if not group_id:
@@ -287,9 +281,24 @@ class ClippingGroupAPI(APIView):
     
     def post(self, request):
         '''
-        Clipping Group Create/Update API
+        Create/Update Clipping Group API
+        REQUEST FORMAT:
+        {
+            "user": group에 포함된 user list excel 파일 (file),
+            "body":{
+                "name": group name (str),
+                "collect_data": 그룹 수집 기간(F: 어제, T: 당일) (boolean),
+                "keywords":선택한 키워드 목록 (str list),
+                "schedules": 수집 시기 (datetime list)
+            } ==> string으로 전달됨, json.loads(data["body"]) 필수
+        }
+        RESPONSE FORMAT:
+        {
+            "success": True/False (boolean)
+        }
         '''
         data = request.POST
+        print(data)
         create_user_flag = False
 
         # 'not in data' means 'in FILES', so there is an attached file
@@ -424,10 +433,19 @@ class ClippingGroupAPI(APIView):
             return self.error("cannot create Clipping Group schedules")
 
         return JsonResponse(data={"success":True})
-        return self.success(GroupSerializer(group).data)
 
     def delete(self, request):
-        
+        """
+        Delete Clipping Group API
+        REQUEST FORMAT:
+        {
+            "group_id": 그룹 아이디 (num)
+        }
+        RESPONSE FORMAT:
+        {
+            "success": True/False (boolean)
+        }
+        """
         group_id = request.GET.get("group_id")
         
         if group_id is None:
