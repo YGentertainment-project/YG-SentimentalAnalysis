@@ -11,7 +11,12 @@ def base(request):
     general page
     '''
     keyword_list = [key.groupname for key in KeywordGroup.objects.all()]
-    return render(request, 'report/report.html', {'keyword_list': keyword_list})
+    values = {
+            'first_depth' : 'NEWS 데이터',
+            'second_depth': 'NEWS 데이터',
+            'keyword_list': keyword_list
+        }
+    return render(request, 'report/report.html', values)
 
 
 def preview(request):
