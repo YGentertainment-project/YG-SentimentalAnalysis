@@ -42,12 +42,32 @@ def base(request):
             export to excel (receiver download)
             '''
             group_id = request.POST.get('group_id', None) #그룹 id
-            book = None
-            # TODO:
-            # 엑셀 파일인 book을 받아와야함
-            # book = export_datareport(excel_export_type, excel_export_start_date, excel_export_end_date)
-            filename = "파일 이름.xlsx" % ()
-            response = HttpResponse(content=save_virtual_workbook(book), content_type='application/vnd.ms-excel')
+            try:
+                group = Group.objects.filter(id=group_id).first()
+            except:
+                return JsonResponse(data={"success":False, "data": "Clipping Group does not exist"})
+            
+            wb = openpyxl.Workbook()
+            sheet = wb.active
+
+            group_name = getattr(group, "name")
+            users = GroupUser.objects.filter(group_id=group_id).values()
+            user_list = []
+            email_list = []
+
+            for user in users:
+                user_list.append(user["name"])
+                email_list.append(user["email"])
+            
+            i=1
+            for name, email in user_list, email_list:
+                sheet["A"+str(i)] = name
+                sheet["B"+str(i)] = email
+                i+=1
+
+            filename = "%s USER LIST.xlsx" % (group_name)
+            # print(filename)
+            response = HttpResponse(content=save_virtual_workbook(wb), content_type='application/vnd.ms-excel')
             response['Content-Disposition'] = 'attachment; filename='+filename
             return response
         elif type == 'keyword_download':
