@@ -377,6 +377,8 @@ $("#save-group").click(function(){
     // 다른 parameter들은 body에 묶어 보내기
     let body = JSON.stringify(data);
     formData.append("body", JSON.stringify(data));
+    console.log("===formData===");
+    console.log(formData);
     $.ajax({
         url: '/clipping/clipgroup/',
         data: formData,

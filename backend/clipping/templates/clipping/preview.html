@@ -14,16 +14,14 @@
       </div>
         
 
-        <div class="tabmenu">
+        <div class="tabmenu" style="overflow-x: scroll; width: 100%; white-space:nowrap;">
             <ul>
               {% if keywords %}
                     {% for keyword in keywords %}
                     <li id="tab{{keyword}}" class="btnCon keyword-tab">
                       <input type="radio" name="tabmenu">
                       <label>{{keyword}}</label>
-                      <div class="tabCon">
-                          {{keyword}}내용입니다
-                      </div>
+                    
                     </li>
                     {% endfor %}
                     {% else %}
