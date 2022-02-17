@@ -135,7 +135,8 @@ class KeywordExcelAPI(APIView):
                     keyword_table[keyword_group.groupname] = []
                 for keyword in keywords:
                     keyword_table[keyword.keywordgroup.groupname].append(keyword.keyword)
-                max_column = max([len(keywords) for keywords in keyword_table.items()])
+                max_column = max([len(keywords) for _, keywords in keyword_table.items()])
+                print(keyword_table.items())
                 new_wb = openpyxl.Workbook()
                 new_ws = new_wb.active
                 new_ws.cell(1, 1, '키워드')
@@ -187,7 +188,6 @@ class KeywordExcelAPI(APIView):
             row += 1
         Keyword.objects.all().delete()
         KeywordGroup.objects.all().delete()
-        print(keyword_table)
         for keyword_group in keyword_table:
             group_item = KeywordGroup.objects.create(
                 groupname = keyword_group,
@@ -200,7 +200,7 @@ class KeywordExcelAPI(APIView):
                     keywordgroup = group_item,
                     keyword = keyword
                 )
-        return self.success()
+        return self.success(keyword_table)
 
 
 class ClippingGroupAPI(APIView):
