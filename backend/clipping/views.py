@@ -1,5 +1,6 @@
 from distutils.command import check
 import os
+import json
 import datetime 
 import openpyxl
 from openpyxl.writer.excel import save_virtual_workbook
@@ -206,14 +207,17 @@ class ClippingGroupAPI(APIView):
         # 'not in data' means 'in FILES', so there is an attached file
         if 'users' not in data:
             file = request.FILES['users']
-        data = data['body']
+        
+        data = json.loads(data['body'])
+        # data = JSONParser(data)
+        
         try:
             # Create Clipping Group
             group_data = {
                 "name": data["name"],
                 "collect_date": data["collect_date"]
             }
-
+            print(group_data)
             exist_data = Group.objects.filter(name=data["name"]).first()
             #========================================================#
             # Create new Group if there are not same name group      #
@@ -236,50 +240,52 @@ class ClippingGroupAPI(APIView):
                     return self.error("Update clipping group data is not valid")
         except:
             return self.error("cannot create Clipping Group")
-
+        
         group_id = group.data["id"]
 
         # Create Clipping Group Users
-        # if file:
-        #     try:
-        #         #========================================================#
-        #         # Load Excel for external User List...                   #
-        #         #========================================================#
-        #         load_wb = load_workbook(file, data_only=True)
-        #         load_ws = load_wb['Sheet1']
-
-        #         user_list = []
-
-        #         for row in load_ws.rows:
-        #             # Excel Format should be name, email, name, email...
-        #             user_tuple = []
-        #             for cell in row:
-        #                 # [[name, email], [name, email], ...]
-        #                 user_tuple.append(cell.value)
-        #             user_list.append(user_tuple)
-        #         #========================================================#
-
-        #         # To reflect add, update, remove user... delete all in this group
-        #         GroupUser.objects.filter(group_id=group_id).delete()
+        if "users" not in data:
+            try:
+                #========================================================#
+                # Load Excel for external User List...                   #
+                #========================================================#
                 
-        #         #========================================================#
-        #         # Create Group Users in this Group                       #
-        #         #========================================================#
-        #         for user in user_list:
-        #             group_user_data = {
-        #                 "group": group_id,
-        #                 "name": user[0],
-        #                 "email": user[1]
-        #             }
-        #             group_user = GroupUserSerializer(data=group_user_data)
-        #             if group_user.is_valid():
-        #                 group_user.save()
-        #             else:
-        #                 return self.error("Create group user data is not valid")
-        #         #========================================================#
-        #     except:
-        #         return self.error("cannot create Clipping Group users")
+                load_wb = load_workbook(file, data_only=True)
+                load_ws = load_wb['Sheet1']
+                
+                user_list = []
 
+                for row in load_ws.rows:
+                    # Excel Format should be name, email, name, email...
+                    user_tuple = []
+                    for cell in row:
+                        print(cell.value)
+                        # [[name, email], [name, email], ...]
+                        user_tuple.append(cell.value)
+                    user_list.append(user_tuple)
+                #========================================================#
+
+                # To reflect add, update, remove user... delete all in this group
+                GroupUser.objects.filter(group_id=group_id).delete()
+                
+                #========================================================#
+                # Create Group Users in this Group                       #
+                #========================================================#
+                for user in user_list:
+                    group_user_data = {
+                        "group": group_id,
+                        "name": user[0],
+                        "email": user[1]
+                    }
+                    group_user = GroupUserSerializer(data=group_user_data)
+                    if group_user.is_valid():
+                        group_user.save()
+                    else:
+                        return self.error("Create group user data is not valid")
+                #========================================================#
+            except:
+                return self.error("cannot create Clipping Group users")
+        print("user pass")
         # Create Clipping Group Keyword
         try:
             # To reflect add, update, remove keyword... delete all in this group
@@ -302,7 +308,7 @@ class ClippingGroupAPI(APIView):
             #========================================================#
         except:
             return self.error("cannot create Clipping Group keywords")
-
+        print("keyword pass")
         # Create Clipping Group Schedule
         try:
             # To reflect add, update, remove schedule... delete all in this group
@@ -327,7 +333,7 @@ class ClippingGroupAPI(APIView):
             #========================================================#
         except:
             return self.error("cannot create Clipping Group schedules")
-
+        print("sche pass")
         return JsonResponse(data={"success":True})
         return self.success(GroupSerializer(group).data)
 
