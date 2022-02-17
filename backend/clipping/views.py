@@ -23,6 +23,9 @@ def base(request):
         groups = Group.objects.all().values()
         keywords = KeywordGroup.objects.all().values()
 
+        #========================================================#
+        # Search ALL Keyword Groups for display                  #
+        #========================================================#
         keyword_list = []
         for keyword in keywords:
             keyword_list.append(keyword["groupname"])
@@ -33,6 +36,7 @@ def base(request):
             'first_depth' : 'NEWS 클리핑',
             'second_depth': 'NEWS 클리핑',
         }
+
         return render(request, 'clipping/clipping.html', values)
     else:
         type = request.POST['type']
@@ -45,10 +49,14 @@ def base(request):
                 group = Group.objects.filter(id=group_id).first()
             except:
                 return JsonResponse(data={"success":False, "data": "Clipping Group does not exist"})
+            group_name = getattr(group, "name")
+
             wb = openpyxl.Workbook()
             sheet = wb.active
 
-            group_name = getattr(group, "name")
+            #========================================================#
+            # Search Group User list of this group                   #
+            #========================================================#
             users = GroupUser.objects.filter(group_id=group_id).values()
             user_list = []
             email_list = []
@@ -56,11 +64,16 @@ def base(request):
             for user in users:
                 user_list.append(user["name"])
                 email_list.append(user["email"])
+
+            #========================================================#
+            # Make User list Excel sheet                             #
+            #========================================================#
             i=1
             for ii, name in enumerate(user_list):
                 sheet["A"+str(i)] = name
                 sheet["B"+str(i)] = email_list[ii]
                 i+=1
+
             filename = "%s USER LIST.xlsx" % (group_name)
             response = HttpResponse(content=save_virtual_workbook(wb), content_type='application/vnd.ms-excel')
             response['Content-Disposition'] = 'attachment; filename='+filename
@@ -241,23 +254,29 @@ class ClippingGroupAPI(APIView):
         except:
             return self.error("Clipping Group does not exist")
         
-        # total_keywords = GroupKeyword.objects.all().values()
-        # print(total_keywords)
+        #========================================================#
+        # Search Group Keyword List for this group               #
+        #========================================================#
         check_list = []
         checked_keywords = GroupKeyword.objects.filter(group_id=group_id).values()
         for key in checked_keywords:
             check_list.append(key["keyword"])
-        # print(check_list)
 
+        #========================================================#
+        # Search Group schedule List for this group               #
+        #========================================================#
         schedule_list = []
         schedules = GroupSchedule.objects.filter(group_id = group_id).values()
         for key in schedules:
             schedule_list.append(key["time"])
-        # print(schedule_list)
-        
+
+        #========================================================#
+        # Make Response data                                     #
+        #========================================================#
         if group:
             res_data = {}
             res_data["name"] = getattr(group, "name")
+            res_data["collect_date"] = getattr(group, "collect_date")
             # data["total_keywords"] = total_keywords
             res_data["checked_keywords"] = check_list
             res_data["schedule"] = schedule_list
@@ -305,6 +324,7 @@ class ClippingGroupAPI(APIView):
                 group = GroupSerializer(exist_data, data=group_data)
                 if group.is_valid():
                     group.save()
+                    print(data["collect_date"])
                 else:
                     return self.error("Update clipping group data is not valid")
         except:
