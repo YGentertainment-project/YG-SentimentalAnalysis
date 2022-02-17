@@ -50,7 +50,12 @@ function getTime(minutes, seconds) {
  });
 
  function click_group_function(widget){
-    if($(widget).hasClass("clicked-group-btn")){
+     //지금 눌려있는 애가 새로운 아이라면
+    if($('.clicked-group-btn').attr('id') == -1){
+        alert("먼저 새로운 그룹 저장을 해주세요.");
+        return;
+    }
+    else if($(widget).hasClass("clicked-group-btn")){
         $(widget).removeClass("clicked-group-btn");
         $("#group_content").addClass("hide");
     }else{
@@ -58,15 +63,12 @@ function getTime(minutes, seconds) {
         $(".group-btn").not($(widget)).removeClass("clicked-group-btn"); 
         $("#group_content").removeClass("hide");
         //content 보여줄 때 해당 그룹이름과 맞게 가져오기
-        console.log("===id=====");
-        console.log($(widget).attr('id'));
         getKeywordOfGroup($(widget).attr('id'));
     }
+    $("#receiver-upload").val("");
  }
 
 function getKeywordOfGroup(group_id){
-    //TODO: get api 연결
-    //일단 dummy data로 연결하기
     $.ajax({
         url: '/clipping/clipgroup/?' + $.param({
             group_id: group_id
@@ -77,9 +79,9 @@ function getKeywordOfGroup(group_id){
         success: res => {
             console.log("success");
             console.log(res);
-            var keywords = ["키워드1", "키워드3", "키워드8"];
-            var collectdate = true;
-            var schedules = ["1:1", "1:2", "1:3"];
+            var keywords = res.data["checked_keywords"];
+            var collectdate = res.data["collect_date"];
+            var schedules = res.data["schedule"];
 
             //키워드들
             var len = $(".keyword-btn").length;
@@ -165,7 +167,6 @@ function getNewKeywordOfGroup(){
         $(this).addClass("clicked-collect-date-btn");
         $(".collect-date-btn").not($(this)).removeClass("clicked-collect-date-btn");  
     }
-    console.log("click");
  });
 
  //스케줄 + 버튼 누르면
@@ -365,39 +366,59 @@ $("#save-group").click(function(){
 	    "schedules":schedules_list
     }
     console.log(data);
+    var len = $(".clicked-group-btn").length;
+
+    //file 때문에 form-data로 보내기
+    let file = document.getElementById("receiver-upload").files[0];
+    let formData = new FormData(); 
+    formData.append("users", file);
+    // 다른 parameter들은 body에 묶어 보내기
+    let body = JSON.stringify(data);
+    formData.append("body", JSON.stringify(data));
     $.ajax({
         url: '/clipping/clipgroup/',
+        data: formData,
         type: 'POST',
-        datatype:'json',
-        data: JSON.stringify(data),
+        contentType: false,
+        processData: false,
         success: res => {
-            console.log("=======success-------");
             alert("저장되었습니다.");
+            $('.clicked-group-btn').attr('id', res.group);
         },
         error: e => {
-            console.log("=======error-------")
             console.log(e.responseText);
             if(e.responseText["data"] != null)
                 alert(e.responseText["data"]);
             else
                 alert(e.responseText);
         },
-    })
+    });
  });
 
 
   //그룹 삭제(api 연결)
   $("#delete-group").click(function(){
-    var group_name = $('.clicked-group-btn').val();
-    if(group_name == undefined){
+    var group_id = $('.clicked-group-btn').attr('id');
+    console.log("====group_id====");
+    console.log(group_id);
+    if(group_id == undefined){
         alert("삭제할 그룹을 선택해주세요.");
     }
     else if (confirm("삭제하시겠습니까?")) {
-        var data = {
-            "name": group_name
+        //db저장이 아닌 프론트에만 있는 것이기 때문에 서버에 전달 안하고 삭제
+        if(group_id == -1){
+            alert("삭제되었습니다.");
+            location.reload();
+            return;
         }
+        var data = {
+            "group_id": group_id
+        };
+        console.log(data);
         $.ajax({
-            url: 'clipping/clipgroup/',
+            url: '/clipping/clipgroup/?' + $.param({
+                group_id: group_id
+            }),
             type: 'delete',
             datatype:'json',
             data: JSON.stringify(data),
@@ -425,5 +446,10 @@ $("#save-group").click(function(){
 
 //미리보기 화면으로 이동
 $("#go-to-preview").click(function(){
+     //지금 눌려있는 애가 새로운 아이라면
+     if($('.clicked-group-btn').attr('id') == -1){
+        alert("먼저 새로운 그룹 저장을 해주세요.");
+        return;
+    }
     location.href = "/clipping/preview/";
 });

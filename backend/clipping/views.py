@@ -1,5 +1,6 @@
 from distutils.command import check
 import os
+import json
 import datetime 
 import openpyxl
 from openpyxl.writer.excel import save_virtual_workbook
@@ -15,25 +16,63 @@ def base(request):
     '''
     general page
     '''
-    # db연결 필요
-    groups = Group.objects.all()
-    keywords = KeywordGroup.objects.all()
-    print(keywords)
-    values = {
-        'groups': groups,
-        'keywords': ['키워드1', '키워드2', '키워드3', '키워드4', '키워드5', '키워드6', '키워드7', '키워드8', '키워드9', '키워드10'
-        , '키워드11', '키워드12', '키워드13', '키워드14', '키워드15', '키워드16', '키워드17', '키워드18'
-        , '키워드19', '키워드20', '키워드21', '키워드22', '키워드23', '키워드24', '키워드25', '키워드26'],
-        'first_depth' : 'NEWS 클리핑',
-        'second_depth': 'NEWS 클리핑',
-    }
-    return render(request, 'clipping/clipping.html', values)
+    if request.method == 'GET':
+        '''
+        general page
+        '''
+        # db연결 필요
+        groups = Group.objects.all()
+        keywords = KeywordGroup.objects.all()
+        print("===groupds====")
+        print(groups)
+        print(keywords)
+        values = {
+            'groups': groups,
+            'keywords': ['키워드1', '키워드2', '키워드3', '키워드4', '키워드5', '키워드6', '키워드7', '키워드8', '키워드9', '키워드10'
+            , '키워드11', '키워드12', '키워드13', '키워드14', '키워드15', '키워드16', '키워드17', '키워드18'
+            , '키워드19', '키워드20', '키워드21', '키워드22', '키워드23', '키워드24', '키워드25', '키워드26'],
+            'first_depth' : 'NEWS 클리핑',
+            'second_depth': 'NEWS 클리핑',
+        }
+        return render(request, 'clipping/clipping.html', values)
+    else:
+        type = request.POST['type']
+        if type == 'receiver_download':
+            '''
+            export to excel (receiver download)
+            '''
+            group_id = request.POST.get('group_id', None) #그룹 id
+            book = None
+            # TODO:
+            # 엑셀 파일인 book을 받아와야함
+            # book = export_datareport(excel_export_type, excel_export_start_date, excel_export_end_date)
+            filename = "파일 이름.xlsx" % ()
+            response = HttpResponse(content=save_virtual_workbook(book), content_type='application/vnd.ms-excel')
+            response['Content-Disposition'] = 'attachment; filename='+filename
+            return response
+        elif type == 'keyword_download':
+            '''
+            export to excel (keyword download)
+            '''
+            # group_id = request.POST.get('group_id', None) #그룹 id
+            # book = None
+            # # 엑셀 파일인 book을 받아와야함
+            # # book = export_datareport(excel_export_type, excel_export_start_date, excel_export_end_date)
+            # filename = "파일 이름.xlsx" % ()
+            # response = HttpResponse(content=save_virtual_workbook(book), content_type='application/vnd.ms-excel')
+            # response['Content-Disposition'] = 'attachment; filename='+filename
+            # return response
+
+
+
 
 def preview(request):
     '''
     preview page
     '''
+    # db연결 필요
     values = {
+        'keywords': ['키워드1', '키워드2', '키워드3', '키워드4'],
         'first_depth' : 'NEWS 클리핑',
         'second_depth': '미리보기',
     }
@@ -143,17 +182,16 @@ class KeywordExcelAPI(APIView):
                 )
         return self.success()
 
+
 class ClippingGroupAPI(APIView):
     def get(self, request):
         '''
         Clipping Group Read API
         '''
-        data = request.GET.get("group_id")
-        print(data)
-        group_id = data
-        # print(group_id)
+        group_id = request.GET.get("group_id")
         if not group_id:
             return self.error()
+        
         try:
             group = Group.objects.filter(id=group_id).first()
         except:
@@ -188,18 +226,21 @@ class ClippingGroupAPI(APIView):
         '''
         Clipping Group Create/Update API
         '''
-        data = JSONParser().parse(request)
-        # print(data)
-        # if data["users"]:
-        #     file = request.FILES['file_excel']
-
+        data = request.POST
+        # 'not in data' means 'in FILES', so there is an attached file
+        if 'users' not in data:
+            file = request.FILES['users']
+        
+        data = json.loads(data['body'])
+        # data = JSONParser(data)
+        
         try:
             # Create Clipping Group
             group_data = {
                 "name": data["name"],
                 "collect_date": data["collect_date"]
             }
-
+            print(group_data)
             exist_data = Group.objects.filter(name=data["name"]).first()
             #========================================================#
             # Create new Group if there are not same name group      #
@@ -220,53 +261,54 @@ class ClippingGroupAPI(APIView):
                     group.save()
                 else:
                     return self.error("Update clipping group data is not valid")
-            #========================================================#
         except:
             return self.error("cannot create Clipping Group")
-
+        
         group_id = group.data["id"]
 
         # Create Clipping Group Users
-        # if file:
-        #     try:
-        #         #========================================================#
-        #         # Load Excel for external User List...                   #
-        #         #========================================================#
-        #         load_wb = load_workbook(file, data_only=True)
-        #         load_ws = load_wb['Sheet1']
-
-        #         user_list = []
-
-        #         for row in load_ws.rows:
-        #             # Excel Format should be name, email, name, email...
-        #             user_tuple = []
-        #             for cell in row:
-        #                 # [[name, email], [name, email], ...]
-        #                 user_tuple.append(cell.value)
-        #             user_list.append(user_tuple)
-        #         #========================================================#
-
-        #         # To reflect add, update, remove user... delete all in this group
-        #         GroupUser.objects.filter(group_id=group_id).delete()
+        if "users" not in data:
+            try:
+                #========================================================#
+                # Load Excel for external User List...                   #
+                #========================================================#
                 
-        #         #========================================================#
-        #         # Create Group Users in this Group                       #
-        #         #========================================================#
-        #         for user in user_list:
-        #             group_user_data = {
-        #                 "group": group_id,
-        #                 "name": user[0],
-        #                 "email": user[1]
-        #             }
-        #             group_user = GroupUserSerializer(data=group_user_data)
-        #             if group_user.is_valid():
-        #                 group_user.save()
-        #             else:
-        #                 return self.error("Create group user data is not valid")
-        #         #========================================================#
-        #     except:
-        #         return self.error("cannot create Clipping Group users")
+                load_wb = load_workbook(file, data_only=True)
+                load_ws = load_wb['Sheet1']
+                
+                user_list = []
 
+                for row in load_ws.rows:
+                    # Excel Format should be name, email, name, email...
+                    user_tuple = []
+                    for cell in row:
+                        print(cell.value)
+                        # [[name, email], [name, email], ...]
+                        user_tuple.append(cell.value)
+                    user_list.append(user_tuple)
+                #========================================================#
+
+                # To reflect add, update, remove user... delete all in this group
+                GroupUser.objects.filter(group_id=group_id).delete()
+                
+                #========================================================#
+                # Create Group Users in this Group                       #
+                #========================================================#
+                for user in user_list:
+                    group_user_data = {
+                        "group": group_id,
+                        "name": user[0],
+                        "email": user[1]
+                    }
+                    group_user = GroupUserSerializer(data=group_user_data)
+                    if group_user.is_valid():
+                        group_user.save()
+                    else:
+                        return self.error("Create group user data is not valid")
+                #========================================================#
+            except:
+                return self.error("cannot create Clipping Group users")
+        print("user pass")
         # Create Clipping Group Keyword
         try:
             # To reflect add, update, remove keyword... delete all in this group
@@ -289,7 +331,7 @@ class ClippingGroupAPI(APIView):
             #========================================================#
         except:
             return self.error("cannot create Clipping Group keywords")
-
+        print("keyword pass")
         # Create Clipping Group Schedule
         try:
             # To reflect add, update, remove schedule... delete all in this group
@@ -314,9 +356,17 @@ class ClippingGroupAPI(APIView):
             #========================================================#
         except:
             return self.error("cannot create Clipping Group schedules")
-
         return JsonResponse(data={"success":True})
         return self.success(GroupSerializer(group).data)
 
     def delete(self, request):
-        group_id = request.Get.get("group_id")
+        
+        group_id = request.GET.get("group_id")
+        
+        if group_id is None:
+            return self.error("Group id does not exist")
+        
+        Group.objects.filter(id=group_id).delete()
+        #Group keyword, user, schedule is deleted automatically by CASCADE
+
+        return JsonResponse(data={"success":True})
