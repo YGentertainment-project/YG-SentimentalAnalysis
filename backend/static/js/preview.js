@@ -6,10 +6,7 @@ var day = date.getDate();
 $('#preview_title').html(year + "년 " + month + "월 " + day + "일 뉴스클리핑");
 
 
-$("#tab1").click(function(){
+$('.keyword-tab').click(function(){
     console.log("here");
-});
-
-$('input[name=tabmenu]').click(function(){
-    console.log("here");
+    console.log(this);
 });

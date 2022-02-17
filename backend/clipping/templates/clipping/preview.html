@@ -5,27 +5,29 @@
 
    {% block content %}
     <div class="forms">
+      <div class="row_layout" style="justify-content: space-between;">
+        <div class="column_layout" style="text-align: start;">
           <span id="preview_title" style="font-size: 14px;"></span>
-        <br>
-        <span style="font-weight: bold; font-size: 14px;">키워드를 선택하세요</span>
+          <span style="font-weight: bold; font-size: 14px;">키워드를 선택하세요</span>
+        </div>
+        <button class="btn btn-primary" style="margin-top: 10px; font-weight: bold;">바로 발송</button>
+      </div>
         
 
         <div class="tabmenu">
             <ul>
-              <li id="tab1" class="btnCon"><input type="radio" checked name="tabmenu">
-                <label>키워드1</label>
-                <div class="tabCon">
-                    kk
-                </div>
-                
-              </li>
-              <li id="tab2" class="btnCon"><input type="radio" name="tabmenu">
-                <label>키워드2</label>
-                <div class="tabCon">
-                    ss
-                </div>
-                
-              </li>    
+              {% if keywords %}
+                    {% for keyword in keywords %}
+                    <li id="tab{{keyword}}" class="btnCon keyword-tab">
+                      <input type="radio" checked name="tabmenu">
+                      <label>{{keyword}}</label>
+                      <div class="tabCon">
+                          {{keyword}}내용입니다
+                      </div>
+                    </li>
+                    {% endfor %}
+                    {% else %}
+                    {% endif %}
             </ul>
         </div>
     </div>

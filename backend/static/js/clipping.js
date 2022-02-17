@@ -407,9 +407,12 @@ $("#save-group").click(function(){
     else if (confirm("삭제하시겠습니까?")) {
         var data = {
             "group_id": group_id
-        }
+        };
+        console.log(data);
         $.ajax({
-            url: '/clipping/clipgroup',
+            url: '/clipping/clipgroup/?' + $.param({
+                group_id: group_id
+            }),
             type: 'delete',
             datatype:'json',
             data: JSON.stringify(data),

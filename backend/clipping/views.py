@@ -35,7 +35,9 @@ def preview(request):
     '''
     preview page
     '''
+    # db연결 필요
     values = {
+        'keywords': ['키워드1', '키워드2', '키워드3', '키워드4'],
         'first_depth' : 'NEWS 클리핑',
         'second_depth': '미리보기',
     }
