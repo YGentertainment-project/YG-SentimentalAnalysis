@@ -1,8 +1,9 @@
+from distutils.command import check
 import os
 import datetime 
 import openpyxl
 from openpyxl.writer.excel import save_virtual_workbook
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from clipping.serializers import GroupKeywordSerializer, GroupScheduleSerializer, GroupSerializer, GroupUserSerializer
 from utils.api import APIView, validate_serializer
@@ -154,22 +155,34 @@ class ClippingGroupAPI(APIView):
         if not group_id:
             return self.error()
         try:
-            group_name = Group.objects.get(id=group_id)["name"]
-            total_keywords = list(GroupKeyword.objects.all())
-            checked_keywords = list(total_keywords.filter(group_id = group_id).get())
-            schedule = list(GroupSchedule.objects.filter(group_id = group_id))
-            
-            if group_name:
-                data = {}
-                data["name"] = group_name
-                data["total_keywords"] = total_keywords
-                data["checked_keywords"] = checked_keywords
-                data["schedule"] = schedule
-                return self.success(data)
-            else:
-                return self.error("Request does not have any group name")
+            group = Group.objects.filter(id=group_id).first()
         except:
             return self.error("Clipping Group does not exist")
+        
+        # total_keywords = GroupKeyword.objects.all().values()
+        # print(total_keywords)
+        check_list = []
+        checked_keywords = GroupKeyword.objects.filter(group_id=group_id).values()
+        for key in checked_keywords:
+            check_list.append(key["keyword"])
+        print(check_list)
+
+        schedule_list = []
+        schedules = GroupSchedule.objects.filter(group_id = group_id).values()
+        for key in schedules:
+            schedule_list.append(key["time"])
+        print(schedule_list)
+        
+        if group:
+            res_data = {}
+            res_data["name"] = getattr(group, "name")
+            # data["total_keywords"] = total_keywords
+            res_data["checked_keywords"] = check_list
+            res_data["schedule"] = schedule_list
+            return JsonResponse(data={"success":True, "data": res_data})
+        else:
+            return self.error("Request does not have any group name")
+        
     
     def post(self, request):
         '''
@@ -301,7 +314,8 @@ class ClippingGroupAPI(APIView):
             #========================================================#
         except:
             return self.error("cannot create Clipping Group schedules")
-        
+
+        return JsonResponse(data={"success":True})
         return self.success(GroupSerializer(group).data)
 
     def delete(self, request):
