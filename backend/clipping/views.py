@@ -223,13 +223,13 @@ class ClippingGroupAPI(APIView):
         checked_keywords = GroupKeyword.objects.filter(group_id=group_id).values()
         for key in checked_keywords:
             check_list.append(key["keyword"])
-        print(check_list)
+        # print(check_list)
 
         schedule_list = []
         schedules = GroupSchedule.objects.filter(group_id = group_id).values()
         for key in schedules:
             schedule_list.append(key["time"])
-        print(schedule_list)
+        # print(schedule_list)
         
         if group:
             res_data = {}
@@ -247,9 +247,12 @@ class ClippingGroupAPI(APIView):
         Clipping Group Create/Update API
         '''
         data = request.POST
+        create_user_flag = False
+
         # 'not in data' means 'in FILES', so there is an attached file
         if 'users' not in data:
             file = request.FILES['users']
+            create_user_flag = True
         
         data = json.loads(data['body'])
         # data = JSONParser(data)
@@ -260,7 +263,6 @@ class ClippingGroupAPI(APIView):
                 "name": data["name"],
                 "collect_date": data["collect_date"]
             }
-            print(group_data)
             exist_data = Group.objects.filter(name=data["name"]).first()
             #========================================================#
             # Create new Group if there are not same name group      #
@@ -285,9 +287,9 @@ class ClippingGroupAPI(APIView):
             return self.error("cannot create Clipping Group")
         
         group_id = group.data["id"]
-
+        
         # Create Clipping Group Users
-        if "users" not in data:
+        if create_user_flag:
             try:
                 #========================================================#
                 # Load Excel for external User List...                   #
@@ -328,7 +330,7 @@ class ClippingGroupAPI(APIView):
                 #========================================================#
             except:
                 return self.error("cannot create Clipping Group users")
-        print("user pass")
+        
         # Create Clipping Group Keyword
         try:
             # To reflect add, update, remove keyword... delete all in this group
@@ -351,7 +353,7 @@ class ClippingGroupAPI(APIView):
             #========================================================#
         except:
             return self.error("cannot create Clipping Group keywords")
-        print("keyword pass")
+        
         # Create Clipping Group Schedule
         try:
             # To reflect add, update, remove schedule... delete all in this group
@@ -376,6 +378,7 @@ class ClippingGroupAPI(APIView):
             #========================================================#
         except:
             return self.error("cannot create Clipping Group schedules")
+
         return JsonResponse(data={"success":True})
         return self.success(GroupSerializer(group).data)
 
