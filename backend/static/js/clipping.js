@@ -50,7 +50,12 @@ function getTime(minutes, seconds) {
  });
 
  function click_group_function(widget){
-    if($(widget).hasClass("clicked-group-btn")){
+     //지금 눌려있는 애가 새로운 아이라면
+    if($('.clicked-group-btn').attr('id') == -1){
+        alert("먼저 새로운 그룹 저장을 해주세요.");
+        return;
+    }
+    else if($(widget).hasClass("clicked-group-btn")){
         $(widget).removeClass("clicked-group-btn");
         $("#group_content").addClass("hide");
     }else{
@@ -65,8 +70,6 @@ function getTime(minutes, seconds) {
  }
 
 function getKeywordOfGroup(group_id){
-    //TODO: get api 연결
-    //일단 dummy data로 연결하기
     $.ajax({
         url: '/clipping/clipgroup/?' + $.param({
             group_id: group_id
@@ -77,9 +80,9 @@ function getKeywordOfGroup(group_id){
         success: res => {
             console.log("success");
             console.log(res);
-            var keywords = ["키워드1", "키워드3", "키워드8"];
-            var collectdate = true;
-            var schedules = ["1:1", "1:2", "1:3"];
+            var keywords = res.data["checked_keywords"];
+            var collectdate = res.data["collect_date"];
+            var schedules = res.data["schedule"];
 
             //키워드들
             var len = $(".keyword-btn").length;
@@ -365,6 +368,8 @@ $("#save-group").click(function(){
 	    "schedules":schedules_list
     }
     console.log(data);
+    var len = $(".clicked-group-btn").length;
+    
     $.ajax({
         url: '/clipping/clipgroup/',
         type: 'POST',
@@ -373,6 +378,7 @@ $("#save-group").click(function(){
         success: res => {
             console.log("=======success-------");
             alert("저장되었습니다.");
+            $('.clicked-group-btn').attr('id', res.group);
         },
         error: e => {
             console.log("=======error-------")
@@ -388,16 +394,18 @@ $("#save-group").click(function(){
 
   //그룹 삭제(api 연결)
   $("#delete-group").click(function(){
-    var group_name = $('.clicked-group-btn').val();
-    if(group_name == undefined){
+    var group_id = $('.clicked-group-btn').attr('id');
+    console.log("====group_id====");
+    console.log(group_id);
+    if(group_id == undefined){
         alert("삭제할 그룹을 선택해주세요.");
     }
     else if (confirm("삭제하시겠습니까?")) {
         var data = {
-            "name": group_name
+            "group_id": group_id
         }
         $.ajax({
-            url: 'clipping/clipgroup/',
+            url: '/clipping/clipgroup',
             type: 'delete',
             datatype:'json',
             data: JSON.stringify(data),
