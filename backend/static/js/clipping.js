@@ -63,10 +63,9 @@ function getTime(minutes, seconds) {
         $(".group-btn").not($(widget)).removeClass("clicked-group-btn"); 
         $("#group_content").removeClass("hide");
         //content 보여줄 때 해당 그룹이름과 맞게 가져오기
-        console.log("===id=====");
-        console.log($(widget).attr('id'));
         getKeywordOfGroup($(widget).attr('id'));
     }
+    $("#receiver-upload").val("");
  }
 
 function getKeywordOfGroup(group_id){
@@ -168,7 +167,6 @@ function getNewKeywordOfGroup(){
         $(this).addClass("clicked-collect-date-btn");
         $(".collect-date-btn").not($(this)).removeClass("clicked-collect-date-btn");  
     }
-    console.log("click");
  });
 
  //스케줄 + 버튼 누르면
@@ -370,34 +368,31 @@ $("#save-group").click(function(){
     console.log(data);
     var len = $(".clicked-group-btn").length;
 
-    
-//     let file = document.getElementById("receiver-download").files[0];
-//     console.log("====file====");
-//     console.log(file);
-// let formData = new FormData();
-     
-// formData.append("photo", photo);
-// console.log(formData);
-// fetch('/upload/image', {method: "POST", body: formData});
+    //file 때문에 form-data로 보내기
+    let file = document.getElementById("receiver-upload").files[0];
+    let formData = new FormData(); 
+    formData.append("users", file);
+    // 다른 parameter들은 body에 묶어 보내기
+    let body = JSON.stringify(data);
+    formData.append("body", body);
     $.ajax({
         url: '/clipping/clipgroup/',
+        data: formData,
         type: 'POST',
-        datatype:'json',
-        data: JSON.stringify(data),
+        contentType: false,
+        processData: false,
         success: res => {
-            console.log("=======success-------");
             alert("저장되었습니다.");
             $('.clicked-group-btn').attr('id', res.group);
         },
         error: e => {
-            console.log("=======error-------")
             console.log(e.responseText);
             if(e.responseText["data"] != null)
                 alert(e.responseText["data"]);
             else
                 alert(e.responseText);
         },
-    })
+    });
  });
 
 

@@ -200,11 +200,11 @@ class ClippingGroupAPI(APIView):
         '''
         Clipping Group Create/Update API
         '''
-        data = JSONParser().parse(request)
-        # print(data)
-        # if data["users"]:
-        #     file = request.FILES['users']
-
+        data = request.POST
+        # 'not in data' means 'in FILES', so there is an attached file
+        if 'users' not in data:
+            file = request.FILES['users']
+        data = data['body']
         try:
             # Create Clipping Group
             group_data = {
