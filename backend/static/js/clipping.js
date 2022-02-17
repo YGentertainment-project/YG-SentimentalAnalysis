@@ -64,6 +64,7 @@ function getTime(minutes, seconds) {
         $("#group_content").removeClass("hide");
         //content 보여줄 때 해당 그룹이름과 맞게 가져오기
         getKeywordOfGroup($(widget).attr('id'));
+        $('#receiver_download_group_id').val($(widget).attr('id'));
     }
     $("#receiver-upload").val("");
  }
@@ -148,6 +149,7 @@ function getNewKeywordOfGroup(){
     for(var i=0; i<1; i++){
         add_schedule_function();
     }
+    $('#receiver_download_group_id').val("");
 }
 
 //키워드 버튼 누르면 변하도록
