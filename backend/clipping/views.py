@@ -168,7 +168,7 @@ class ClippingGroupAPI(APIView):
         checked_keywords = GroupKeyword.objects.filter(group_id=group_id).values()
         for key in checked_keywords:
             check_list.append(key["keyword"])
-        print(check_list)
+        # print(check_list)
 
         #========================================================#
         # Make this group's schedule list                        #
@@ -177,7 +177,7 @@ class ClippingGroupAPI(APIView):
         schedules = GroupSchedule.objects.filter(group_id = group_id).values()
         for key in schedules:
             schedule_list.append(key["time"])
-        print(schedule_list)
+        # print(schedule_list)
         
         #========================================================#
         # Create and Return response data                        #
@@ -328,9 +328,9 @@ class ClippingGroupAPI(APIView):
         return self.success(GroupSerializer(group).data)
 
     def delete(self, request):
-        group_id = request.Get.get("group_id")
+        group_id = request.GET.get("group_id")
         if not group_id:
-            return self.error()
+            return self.error("Group id does not exist")
 
         GroupKeyword.objects.filter(group_id=group_id).delete()
         GroupSchedule.objects.filter(group_id=group_id).delete()
