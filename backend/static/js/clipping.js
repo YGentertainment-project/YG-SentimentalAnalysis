@@ -473,6 +473,15 @@ $('#keyword-uplaod-btn').click(function (){
     });
 });
 
+document.querySelector("#receiver-download-btn").addEventListener("click", function(event) {
+    //그룹이 저장되지 않은 상태에서 엑셀 다운로드 방지
+    var group_id = $('.clicked-group-btn').attr('id');
+    if(group_id == -1){
+        alert("그룹을 먼저 저장한 후에 엑셀 다운로드를 할 수 있습니다.");
+        event.preventDefault();
+    }
+}, false);
+
 
 //미리보기 화면으로 이동
 $("#go-to-preview").click(function(){

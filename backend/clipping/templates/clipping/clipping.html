@@ -89,18 +89,18 @@
                 <br>
 
                 <div class="keyword-board" style="width: 60% !important;">
-                    <form method="post" action="{%url 'clipping:base' %}" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        <input type="text" name="group_id" value="" id="receiver_download_group_id" style="display:none;">
-                        <input type="text" name="type" value="receiver_download" style="display:none;">
-                        <button class="border-btn"
-                            type="submit" style="font-size: 12px !important;">엑셀 다운로드</button>
-                    </form>
                     <div class="row_layout child-margin-5">
                         <span style="font-weight: bold; font-size: 14px;">엑셀 업로드: </span>
                         <!-- <button class="border-btn">엑셀 업로드</button> -->
                         <input id="receiver-upload" class="form-control" type="file" name="users" style="width: 300px;">
                     </div>
+                    <form method="post" action="{%url 'clipping:base' %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="text" name="group_id" value="" id="receiver_download_group_id" style="display:none;">
+                        <input type="text" name="type" value="receiver_download" style="display:none;">
+                        <button class="border-btn" id="receiver-download-btn"
+                            type="submit" style="font-size: 12px !important;">엑셀 다운로드</button>
+                    </form>
                 </div>
             </div>
     
