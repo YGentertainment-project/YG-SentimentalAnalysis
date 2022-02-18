@@ -11,6 +11,6 @@ RUN apt install -y ./google-chrome-stable_97.0.4692.71-1_amd64.deb \
 
 ADD ./backend /app
 
-RUN pip install --no-cache-dir -r /app/deploy/requirements.txt
+RUN pip3 install --no-cache-dir -r /app/deploy/requirements.txt
 
 EXPOSE 8000
