@@ -20,17 +20,13 @@ production_env = get_env("YG_ENV", "dev") == "production"
 
 
 def crawling(spider_name, from_date, to_date):
-    # print('crawling start')
     process = CrawlerProcess(settings)
     process.crawl(spider_loader.load(spider_name), from_date=from_date, to_date=to_date)
     process.start()
-    # print('crawling finish')
 
 
 def nlpanalysis(from_date, to_date):
-    # print('nlp analysis start')
     NLP.NLP_update(from_date, to_date)
-    # print('nlp analysis finish')
 
 
 @app.task(name="schedule_task", bind=True)
