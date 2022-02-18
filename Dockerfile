@@ -1,5 +1,7 @@
 FROM pytorch/pytorch:1.10.0-cuda11.3-cudnn8-runtime
+ENV YG_ENV production
 
+ADD ./backend /app
 WORKDIR /app
 
 RUN apt-get update \
@@ -9,11 +11,31 @@ RUN apt-get update \
 RUN apt install -y ./google-chrome-stable_97.0.4692.71-1_amd64.deb \
     && apt-get -f install
 
-RUN apt-get install -y python3-dev default-libmysqlclient-dev build-essential
+# mysqlclient 설치
+RUN apt-get install -y python3-dev default-libmysqlclient-dev build-essential gcc
 
 ADD ./backend /app
 
-RUN pip3 install --no-cache-dir -r /app/deploy/requirements.txt
+# pip 업그레이드
+RUN cd /usr/local/bin && \
+    ln -s /usr/bin/python3 python && \
+    ln -s /usr/bin/pip3 pip && \
+    pip3 install --upgrade pip
+
+# apt cleanse
+RUN apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN apt-get update \
+    && apt-get install -y wget
+
+WORKDIR /app
+
+RUN pip install --no-cache-dir -r /app/deploy/requirements.txt
+
+ARG DATA=/data
+RUN mkdir -p ${DATA}/config
+RUN if [ ! -f "${DATA}/config/secret.key" ] ; then echo $(cat /dev/urandom | head -1 | md5sum | head -c 32) > "${DATA}/config/secret.key" ; fi
 
 RUN bash /app/deploy/entrypoint.sh
 

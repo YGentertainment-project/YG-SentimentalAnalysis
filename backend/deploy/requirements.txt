@@ -104,6 +104,7 @@ Scrapy==2.5.1
 scrapy-djangoitem==1.1.1
 selenium==4.1.0
 service-identity==21.1.0
+sentencepiece==0.1.96
 six==1.16.0
 sniffio==1.2.0
 sortedcontainers==2.4.0
@@ -112,7 +113,6 @@ soyspacing==1.0.17
 sqlparse==0.2.4
 sshtunnel==0.4.0
 tokenizers==0.11.4
-torch>=1.10
 tqdm==4.62.3
 transformers==4.16.2
 trio==0.19.0

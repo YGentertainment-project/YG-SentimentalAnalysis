@@ -8,7 +8,7 @@ services:
         volumes:
             - ./db/data/maria:/var/lib/mysql
         environment:
-            - MYSQL_HOST=ygenter
+            - MYSQL_HOST=yg-mariadb
             - MYSQL_PORT=3306
             - MYSQL_ROOT_PASSWORD=ygenter
             - MYSQL_DATABASE=ygenter
@@ -30,11 +30,11 @@ services:
     yg-sentimental-analysis:
         image: sentimental-analysis
         container_name: yg-sentimental-analysis
-        deploy:
-            resources:
-                reservations:
-                    devices:
-                        - capabilities: [gpu]
+#        deploy:
+#            resources:
+#                reservations:
+#                    devices:
+#                        - capabilities: [gpu]
         restart: always
         depends_on:
             - yg-mariadb
@@ -43,10 +43,10 @@ services:
             - "0.0.0.0:8082:8000"
         command: >
             sh -c "python3 manage.py makemigrations &&
-                   python3 manage.py migrate --database mongo &&
-                   python3 manage.py migrate --database default &&
+                   python3 manage.py migrate &&
                    python3 manage.py runserver 0.0.0.0:8000 --insecure"
 
+#                   python3 manage.py migrate mongo &&
     yg-rabbitmq:
         image: rabbitmq:3.7.14-management-alpine
         container_name: yg-rabbitmq
