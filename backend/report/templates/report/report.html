@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+    <html lang="ko">
+
+    {% extends 'main.html' %}
+
+    {% block content %}
+
+    <div class="forms">
+        <span class="subtitle" style="padding-left: 10px;"></span>
+        
+        <div id="group_content" class="group_content">
+            <div>
+                <span class="subtitle">@@검색</span>
+                <div class="keyword-board child-margin-5">
+                    <!-- 검색 기능 -->
+                    <div class="search-body my-auto">
+                        <div class="search-date">
+                            조회기간 
+                        </div>
+                        <div class="search-date-form">
+                            <input type="date" id="searchDateFrom">
+                            ~
+                            <input type="date" id="searchDateTo">
+                        </div>
+                        <div class="search-press">
+                            언론사
+                        </div>
+                        <div class="search-press-form">
+                            <input type="text" id="searchPress">
+                        </div>
+                        <div class="search-keyword">
+                            키워드                     
+                        </div>
+                        <div class="search-keyword-form">
+                            <input type="text" list="dl" id="searchKeyword">
+                                <datalist id="dl">
+                                    {% if keyword_list %}
+                                    {% for keyword in keyword_list %}
+                                    <option value="{{keyword}}">{{keyword}}</option>
+                                    {% endfor %}
+                                    {% endif %}
+                                </datalist>                   
+                        </div>
+                        <div class="search-title">
+                            제목
+                        </div>
+                        <div class="search-title-form">
+                            <input type="text" id="searchTitle">
+                        </div>
+                        <button class="border-btn" id="searchBtn">검색</button>
+                    </div>
+                    <!-- 검색 끝 -->
+                </div>
+            </div>
+                   
+            <div>
+                <span class="subtitle">@@datatable</span>
+                <!-- News raw data datatables -->
+                <div class="card border-0 shadow  mb-4">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-centered table-nowrap mb-0 rounded" id="dataTable" style="width: 100%; border-bottom: 0px solid #111;">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th class="border-0 rounded-start">제목</th>
+                                        <th class="border-0">키워드</th>
+                                        <th class="border-0">작성일시</th>
+                                        <th class="border-0 rounded-end">언론사</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% endblock content %}
+</html>

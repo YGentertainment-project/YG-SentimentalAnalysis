@@ -1,0 +1,54 @@
+.search-body{
+    width: 90%;
+    display: grid;
+    grid-template-columns: 1fr 6fr 1fr 6fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    margin-bottom: 20px;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    align-items: center;
+    justify-content: center;
+}
+.search-body input{
+    width: 60%
+}
+.search-body .search-date{
+    grid-column: 1/2;
+    grid-row: 1/2;
+}
+.search-body .search-date-form{
+    grid-column: 2/3;
+    grid-row: 1/2;
+}
+.search-body .search-date-form input{
+    width: 28.5%;
+}
+.search-body .search-press{
+    grid-column: 3/4;
+    grid-row: 1/2;
+}
+.search-body .search-press-form{
+    grid-column: 4/5;
+    grid-row: 1/2;
+}
+.search-body .search-keyword{
+    grid-column: 1/2;
+    grid-row: 2/3;
+}
+.search-body .search-keyword-form{
+    grid-column: 2/3;
+    grid-row: 2/3;
+}
+.search-body .search-title{
+    grid-column: 3/4;
+    grid-row: 2/3;
+}
+.search-body .search-title-form{
+    grid-column: 4/5;
+    grid-row: 2/3;
+}
+.search-body .search-button{
+    grid-column: 5/6;
+    grid-row: 1/3;
+}
