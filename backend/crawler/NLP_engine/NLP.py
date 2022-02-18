@@ -370,32 +370,47 @@ class BertTokenizer(PreTrainedTokenizer):
 
 class NLP_Engine:
     def __init__(self,
-                 ner_model_path='./crawler/NLP_engine/ner_model',
+                 ner_model_path='./ner_model',
+                 absa_model_path='./absa_model',
                  device="cuda" if torch.cuda.is_available() else "cpu"
-                 ) -> None:
+                ) -> None:
         self.ner_model_path = ner_model_path
+        self.absa_model_path = absa_model_path
         self.pos_model = Mecab()
         self.device = device
-        self.ner_tokenizer = BertTokenizer.from_pretrained('monologg/kobert')
-        self.load_ner_model(ner_model_path)
+        self.tokenizer = BertTokenizer.from_pretrained('monologg/kobert')
+        self.load_ner_model()
+        self.load_absa_model()
 
-    def load_ner_model(self, model_path):
+    def load_ner_model(self):
         # Check whether model exists
-        if not os.path.exists(model_path):
+        if not os.path.exists(self.ner_model_path):
             raise Exception("Model Path Error")
 
         try:
-            self.ner_model = AutoModelForTokenClassification.from_pretrained(model_path)
+            self.ner_model = AutoModelForTokenClassification.from_pretrained(self.ner_model_path)
             self.ner_model.to(self.device)
             self.ner_model.eval()
         except:
             raise Exception("Some model files might be missing...")
+    
+    def load_absa_model(self):
+        # Check whether model exists
+        if not os.path.exists(self.absa_model_path):
+            raise Exception("Model Path Error")
 
-    def sent_to_ner_dataset(self, sents, max_seq_len=50):
-        cls_token = self.ner_tokenizer.cls_token
-        sep_token = self.ner_tokenizer.sep_token
-        unk_token = self.ner_tokenizer.unk_token
-        pad_token_id = self.ner_tokenizer.pad_token_id
+        try:
+            self.absa_model = AutoModelForTokenClassification.from_pretrained(self.absa_model_path)
+            self.absa_model.to(self.device)
+            self.absa_model.eval()
+        except:
+            raise Exception("Some model files might be missing...")
+    
+    def sent_to_dataset(self, sents, max_seq_len=50):
+        cls_token = self.tokenizer.cls_token
+        sep_token = self.tokenizer.sep_token
+        unk_token = self.tokenizer.unk_token
+        pad_token_id = self.tokenizer.pad_token_id
         pad_token_label_id = torch.nn.CrossEntropyLoss().ignore_index
 
         all_input_ids = []
@@ -407,7 +422,7 @@ class NLP_Engine:
             tokens = []
             slot_label_mask = []
             for word in sent.split():
-                word_tokens = self.ner_tokenizer.tokenize(word)
+                word_tokens = self.tokenizer.tokenize(word)
                 if not word_tokens:
                     word_tokens = [unk_token]  # For handling the bad-encoded word
                 tokens.extend(word_tokens)
@@ -430,7 +445,7 @@ class NLP_Engine:
             token_type_ids = [0] + token_type_ids
             slot_label_mask = [pad_token_label_id] + slot_label_mask
 
-            input_ids = self.ner_tokenizer.convert_tokens_to_ids(tokens)
+            input_ids = self.tokenizer.convert_tokens_to_ids(tokens)
 
             # The mask has 1 for real tokens and 0 for padding tokens. Only real tokens are attended to.
             attention_mask = [1] * len(input_ids)
@@ -446,29 +461,29 @@ class NLP_Engine:
             all_attention_mask.append(attention_mask)
             all_token_type_ids.append(token_type_ids)
             all_slot_label_mask.append(slot_label_mask)
-
+        
         all_input_ids = torch.tensor(all_input_ids, dtype=torch.long)
         all_attention_mask = torch.tensor(all_attention_mask, dtype=torch.long)
         all_token_type_ids = torch.tensor(all_token_type_ids, dtype=torch.long)
         all_slot_label_mask = torch.tensor(all_slot_label_mask, dtype=torch.long)
-
+        
         dataset = TensorDataset(all_input_ids, all_attention_mask, all_token_type_ids, all_slot_label_mask)
 
         return dataset
-
+    
     def ner_postprocessing(self, dataset, preds, id2label):
         return_list = []
         for i in range(len(dataset)):
             data = dataset[i]
             token_ids = data[0][data[1] == 1][1:-1]
-            tokens = self.ner_tokenizer.convert_ids_to_tokens(token_ids)
+            tokens = self.tokenizer.convert_ids_to_tokens(token_ids)
             pred = preds[i]
             eojeol_range = []
             for j, token in enumerate(tokens):
                 if token[0] == SPIECE_UNDERLINE:
                     eojeol_range.append(j)
             eojeol_range.append(len(tokens))
-            eojeol_range = [(eojeol_range[idx], eojeol_range[idx + 1]) for idx in range(len(eojeol_range) - 1)]
+            eojeol_range = [(eojeol_range[idx], eojeol_range[idx+1]) for idx in range(len(eojeol_range) - 1)]
             tag_list = []
             prev_tag = False
             for s, e in eojeol_range:
@@ -479,7 +494,7 @@ class NLP_Engine:
                 if id2label[str(pred[s + 1])] != 'O':
                     if id2label[str(pred[s + 1])][-1] == 'B':
                         tag_list.append([tag_str.strip(), id2label[str(pred[s + 1])][:-2]])
-                        if id2label[str(pred[e + 1])] != ' O':
+                        if id2label[str(pred[e + 1])] !=' O':
                             prev_tag = True
                         else:
                             prev_tag = False
@@ -487,21 +502,16 @@ class NLP_Engine:
                         if prev_tag:
                             tag_list[-1][0] += ' '
                         else:
-                            tag_list.append(['', id2label[str(pred[s + 1])][:-2]])
+                            tag_list.append(['', id2label[str(pred[s + 1])]])
                         tag_list[-1][0] += tag_str
             return_list.append(tag_list)
-            # print(' '.join([tokens[j] for j in range(s, e)]))
-            # print(' '.join([id2label[str(preds[i][j + 1])] for j in range(s, e)]))
-            # for j in range(seq_len):
-            #     print(id2label[str(preds[i][j + 1])], tokens[j])
-            # print(preds[i][1:seq_len + 1], len(token_ids))
         return return_list
-
+    
     def ner_predict(self, sents, batch_size=32):
-        if len(sents) == 0:
+        if len(sents) == 0 :
             return []
         id2label = json.load(open(os.path.join(self.ner_model_path, 'config.json'), 'r', encoding='utf-8'))['id2label']
-        dataset = self.sent_to_ner_dataset(sents)
+        dataset = self.sent_to_dataset(sents)
         sampler = SequentialSampler(dataset)
         data_loader = DataLoader(dataset, sampler=sampler, batch_size=batch_size)
 
@@ -512,8 +522,8 @@ class NLP_Engine:
             batch = tuple(t.to(self.device) for t in batch)
             with torch.no_grad():
                 inputs = {"input_ids": batch[0],
-                          "attention_mask": batch[1],
-                          "labels": None}
+                        "attention_mask": batch[1],
+                        "labels": None}
                 outputs = self.ner_model(**inputs)
                 logits = outputs[0]
 
@@ -525,8 +535,75 @@ class NLP_Engine:
                     all_slot_label_mask = np.append(all_slot_label_mask, batch[3].detach().cpu().numpy(), axis=0)
 
         preds = np.argmax(preds, axis=2)
-
+        
         return self.ner_postprocessing(dataset, preds, id2label)
+    
+    def absa_postprocessing(self, dataset, preds, id2label):
+        return_list = []
+        for i in range(len(dataset)):
+            data = dataset[i]
+            token_ids = data[0][data[1] == 1][1:-1]
+            tokens = self.tokenizer.convert_ids_to_tokens(token_ids)
+            pred = preds[i]
+            eojeol_range = []
+            for j, token in enumerate(tokens):
+                if token[0] == SPIECE_UNDERLINE:
+                    eojeol_range.append(j)
+            eojeol_range.append(len(tokens))
+            eojeol_range = [(eojeol_range[idx], eojeol_range[idx+1]) for idx in range(len(eojeol_range) - 1)]
+            tag_list = []
+            prev_tag = False
+            for s, e in eojeol_range:
+                tag_str = ''
+                for j in range(s, e):
+                    if id2label[str(pred[j + 1])] != 'O':
+                        tag_str += tokens[j].replace(SPIECE_UNDERLINE, '')
+                if id2label[str(pred[s + 1])] != 'O':
+                    if id2label[str(pred[s + 1])][-1] == 'B':
+                        tag_list.append([tag_str.strip(), id2label[str(pred[s + 1])][:-2]])
+                        if id2label[str(pred[e + 1])] !=' O':
+                            prev_tag = True
+                        else:
+                            prev_tag = False
+                    if id2label[str(pred[s + 1])][-1] == 'I':
+                        if prev_tag:
+                            tag_list[-1][0] += ' '
+                        else:
+                            tag_list.append(['', id2label[str(pred[s + 1])]])
+                        tag_list[-1][0] += tag_str
+            return_list.append(tag_list)
+        return return_list
+    
+    def absa_predict(self, sents, batch_size=32):
+        if len(sents) == 0 :
+            return []
+        id2label = json.load(open(os.path.join(self.absa_model_path, 'config.json'), 'r', encoding='utf-8'))['id2label']
+        dataset = self.sent_to_dataset(sents)
+        sampler = SequentialSampler(dataset)
+        data_loader = DataLoader(dataset, sampler=sampler, batch_size=batch_size)
+
+        all_slot_label_mask = None
+        preds = None
+
+        for batch in data_loader:
+            batch = tuple(t.to(self.device) for t in batch)
+            with torch.no_grad():
+                inputs = {"input_ids": batch[0],
+                        "attention_mask": batch[1],
+                        "labels": None}
+                outputs = self.absa_model(**inputs)
+                logits = outputs[0]
+
+                if preds is None:
+                    preds = logits.detach().cpu().numpy()
+                    all_slot_label_mask = batch[3].detach().cpu().numpy()
+                else:
+                    preds = np.append(preds, logits.detach().cpu().numpy(), axis=0)
+                    all_slot_label_mask = np.append(all_slot_label_mask, batch[3].detach().cpu().numpy(), axis=0)
+
+        preds = np.argmax(preds, axis=2)
+        
+        return self.absa_postprocessing(dataset, preds, id2label)
 
     def pos_predict(self, sents):
         results = [self.pos_model.pos(sent) for sent in sents]
@@ -537,7 +614,6 @@ def NLP_update(from_date, to_date):
     from_date = datetime.strptime(from_date, '%Y%m%d')
     to_date = datetime.strptime(to_date, '%Y%m%d')
     to_date = to_date.replace(hour=23, minute=59, second=59)
-    print(from_date, to_date)
     engine = NLP_Engine()
     cleaner = TextCleaner()
     connection = pymongo.MongoClient(f'mongodb://{MONGO_USER}:{MONGO_PSWD}@{MONGO_ADDR}:{MONGO_PORT}')
@@ -546,12 +622,12 @@ def NLP_update(from_date, to_date):
     cursor = raw_data_collection.find({
         'create_dt': {'$gte': from_date, '$lte': to_date, }
     })
-    total_cnt = raw_data_collection.count_documents({
-        'create_dt': {
-            '$gte': from_date,
-            '$lte': to_date,
-        }
-    })
+    # total_cnt = raw_data_collection.count_documents({
+    #     'create_dt': {
+    #         '$gte': from_date,
+    #         '$lte': to_date,
+    #     }
+    # })
     for item in cursor:
         sents = [
             cleaner.cleaning_data(sent)[1]
@@ -560,8 +636,7 @@ def NLP_update(from_date, to_date):
         ]
         ner = engine.ner_predict(sents)
         pos = engine.pos_predict(sents)
-        # print(ner)
-        # print(pos)
+        absa = engine.absa_predict(sents)
         try:
             nlp_data_collection.insert_one(
                 {
@@ -571,7 +646,7 @@ def NLP_update(from_date, to_date):
                     'keyword': item['keyword'],
                     'NER': json.dumps(ner, ensure_ascii=False),
                     'POS': json.dumps(pos, ensure_ascii=False),
-                    'ABSA': ''
+                    'ABSA': json.dumps(absa, ensure_ascii=False)
                 }
             )
         except DuplicateKeyError:
