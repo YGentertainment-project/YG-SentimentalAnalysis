@@ -1,16 +1,18 @@
 from distutils.command import check
 import os
 import json
-import datetime 
+import datetime
+import traceback 
 import openpyxl
+from pymongo import MongoClient
+from openpyxl import load_workbook
 from openpyxl.writer.excel import save_virtual_workbook
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from clipping.serializers import GroupKeywordSerializer, GroupScheduleSerializer, GroupSerializer, GroupUserSerializer
 from utils.api import APIView, validate_serializer
 from .models import Keyword, KeywordGroup, Group, GroupKeyword, GroupSchedule, GroupUser
-from rest_framework.parsers import JSONParser
-from openpyxl import load_workbook
+from crawler.scrapy_app.apikey import *
 
 def base(request):
     '''
@@ -23,6 +25,9 @@ def base(request):
         groups = Group.objects.all().values()
         keywords = KeywordGroup.objects.all().values()
 
+        #========================================================#
+        # Search ALL Keyword Groups for display                  #
+        #========================================================#
         keyword_list = []
         for keyword in keywords:
             keyword_list.append(keyword["groupname"])
@@ -33,6 +38,7 @@ def base(request):
             'first_depth' : 'NEWS 클리핑',
             'second_depth': 'NEWS 클리핑',
         }
+
         return render(request, 'clipping/clipping.html', values)
     else:
         type = request.POST['type']
@@ -45,10 +51,14 @@ def base(request):
                 group = Group.objects.filter(id=group_id).first()
             except:
                 return JsonResponse(data={"success":False, "data": "Clipping Group does not exist"})
+            group_name = getattr(group, "name")
+
             wb = openpyxl.Workbook()
             sheet = wb.active
 
-            group_name = getattr(group, "name")
+            #========================================================#
+            # Search Group User list of this group                   #
+            #========================================================#
             users = GroupUser.objects.filter(group_id=group_id).values()
             user_list = []
             email_list = []
@@ -56,11 +66,16 @@ def base(request):
             for user in users:
                 user_list.append(user["name"])
                 email_list.append(user["email"])
+
+            #========================================================#
+            # Make User list Excel sheet                             #
+            #========================================================#
             i=1
             for ii, name in enumerate(user_list):
                 sheet["A"+str(i)] = name
                 sheet["B"+str(i)] = email_list[ii]
                 i+=1
+
             filename = "%s USER LIST.xlsx" % (group_name)
             response = HttpResponse(content=save_virtual_workbook(wb), content_type='application/vnd.ms-excel')
             response['Content-Disposition'] = 'attachment; filename='+filename
@@ -80,7 +95,6 @@ def base(request):
                     for keyword in keywords:
                         keyword_table[keyword.keywordgroup.groupname].append(keyword.keyword)
                     max_column = max([len(keywords) for _, keywords in keyword_table.items()])
-                    print(keyword_table.items())
                     new_wb = openpyxl.Workbook()
                     new_ws = new_wb.active
                     new_ws.cell(1, 1, '키워드')
@@ -110,42 +124,70 @@ def preview(request):
     '''
     preview page
     '''
-    keywords = KeywordGroup.objects.all().values()
-
-    keyword_list = []
-    for keyword in keywords:
-        keyword_list.append(keyword["groupname"])
-    values = {
-        'keywords': keyword_list,
-        'first_depth' : 'NEWS 클리핑',
-        'second_depth': '미리보기',
-    }
-    return render(request, 'clipping/preview.html', values)
+    try:
+        group_id = request.GET['group_id']
+        group = Group.objects.filter(id=group_id).first()
+        if group is None:
+            return JsonResponse(data={"fail":False, "data": "Clipping Group does not exist"})
+        keywords = GroupKeyword.objects.filter(group=group).values()
+        keyword_list = [keyword["keyword"] for keyword in keywords]
+        today = datetime.datetime.now()
+        today = today.replace(hour=0, minute=0, second=0, microsecond=0)
+        if group.collect_date == 0:
+            from_date = today - datetime.timedelta(days=1)
+            to_date = today - datetime.timedelta(microseconds=1)
+        elif group.collect_date == 1:
+            from_date = today
+            to_date = today - datetime.timedelta(microseconds=1)
+        elif group.collect_date == 2:
+            from_date = today - datetime.timedelta(days=7)
+            to_date = today - datetime.timedelta(microseconds=1)
+        elif group.collect_date == 3:
+            from_date = today - datetime.timedelta(days=30)
+            to_date = today - datetime.timedelta(microseconds=1)
+        
+        conn = MongoClient(f'mongodb://{MONGO_USER}:{MONGO_PSWD}@{MONGO_ADDR}:{MONGO_PORT}')
+        news_collection = conn[MONGO_DB]['News']
+        
+        date_query = {'create_dt': {'$gte': from_date, '$lt': to_date}}
+        news_list = {}
+        
+        reaction_ko = {
+            'cheer': '응원해요',
+            'congrats': '축하해요',
+            'expect': '기대해요',
+            'like': '좋아요',
+            'sad': '슬퍼요',
+            'surprise': '놀랐어요'
+        }
+        
+        keyword_list = [(keyword, keyword.replace(' ','-')) for keyword in keyword_list]
+        for keyword, keyword_without_space in keyword_list:
+            cursor = news_collection.find(
+                {'$and':[date_query, {'keyword':{'$eq': keyword}}]}, 
+                allow_disk_use=True).sort('reaction_sum', -1).limit(10)
+            keyword = keyword.replace(' ','-')
+            news_list[keyword_without_space] = list(cursor)
+            for news_item in news_list[keyword_without_space]:
+                news_item['reaction_ko'] = {
+                    reaction_ko[reaction_type]:reaction_value 
+                    for reaction_type, reaction_value in news_item['reaction'].items()
+                }
+        values = {
+            'keywords': keyword_list,
+            'today': today,
+            'from_date': from_date,
+            'to_date': to_date,
+            'news_list': news_list,
+            'first_depth' : 'NEWS 클리핑',
+            'second_depth': '미리보기',
+        }
+        return render(request, 'clipping/preview.html', values)
+    except:
+        traceback.print_exc()
+        return JsonResponse(data={"success":False, "data": "Internal Server Error"})
 
 class KeywordAPI(APIView):
-    def get(self, request):
-        '''
-        Keyword list read API
-        '''
-        try:
-            keywords = Keyword.objects.all()
-            if keywords.exists():
-                keyword_list = keywords.values()
-                data = []
-                for entry in keyword_list:
-                    data.append(entry)
-                return self.success(data)
-            else:
-                return self.success()
-        except:
-            return self.error("Keyword does not exist")
-
-    def post(self, request):
-        '''
-        Keyword list Excel Import
-        '''
-
-class KeywordExcelAPI(APIView):
     def get(self, request):
         '''
         Keyword list read API
@@ -227,10 +269,27 @@ class KeywordExcelAPI(APIView):
         return self.success(keyword_table)
 
 
+# CLippingGroupAPI
+# CRUD NEWS Clipping Groups by using 
+# | get: Read Clipping Groups
+# | post: Create/Update Clipping Groups
+# | delete: Delete Clipping Groups
+# Author: 최영우, cyw7515@naver.com
 class ClippingGroupAPI(APIView):
     def get(self, request):
         '''
-        Clipping Group Read API
+        Read Clipping Group API
+        REQUEST FORMAT:
+        {
+            "group_id": group_id (num)
+        }
+        RESPONSE FORMAT:
+        {
+            "name": group_name(str),
+            "collect_date": 수집기간(T:당일, F:어제) (boolean),
+            "checked_keywords": 선택한 키워드 목록 (str list),
+            "schedules": 수집시기 (datetime list),
+        }
         '''
         group_id = request.GET.get("group_id")
         if not group_id:
@@ -241,23 +300,29 @@ class ClippingGroupAPI(APIView):
         except:
             return self.error("Clipping Group does not exist")
         
-        # total_keywords = GroupKeyword.objects.all().values()
-        # print(total_keywords)
+        #========================================================#
+        # Search Group Keyword List for this group               #
+        #========================================================#
         check_list = []
         checked_keywords = GroupKeyword.objects.filter(group_id=group_id).values()
         for key in checked_keywords:
             check_list.append(key["keyword"])
-        # print(check_list)
 
+        #========================================================#
+        # Search Group schedule List for this group               #
+        #========================================================#
         schedule_list = []
         schedules = GroupSchedule.objects.filter(group_id = group_id).values()
         for key in schedules:
             schedule_list.append(key["time"])
-        # print(schedule_list)
-        
+
+        #========================================================#
+        # Make Response data                                     #
+        #========================================================#
         if group:
             res_data = {}
             res_data["name"] = getattr(group, "name")
+            res_data["collect_date"] = getattr(group, "collect_date")
             # data["total_keywords"] = total_keywords
             res_data["checked_keywords"] = check_list
             res_data["schedule"] = schedule_list
@@ -268,9 +333,25 @@ class ClippingGroupAPI(APIView):
     
     def post(self, request):
         '''
-        Clipping Group Create/Update API
+        Create/Update Clipping Group API
+        REQUEST FORMAT:
+        {
+            "user": group에 포함된 user list excel 파일 (file),
+            "body":{
+                "name": group name (str),
+                "collect_data": 그룹 수집 기간(0: 어제, 1: 당일 2: 1주 3: 1달) (int),
+                "keywords":선택한 키워드 목록 (str list),
+                "schedules": 수집 시기 (datetime list)
+            } ==> string으로 전달됨, json.loads(data["body"]) 필수
+        }
+        RESPONSE FORMAT:
+        {
+            "success": True/False (boolean),
+            "group": 생성된 그룹의 group_id (int)
+        }
         '''
         data = request.POST
+        print(data)
         create_user_flag = False
 
         # 'not in data' means 'in FILES', so there is an attached file
@@ -403,11 +484,20 @@ class ClippingGroupAPI(APIView):
         except:
             return self.error("cannot create Clipping Group schedules")
 
-        return JsonResponse(data={"success":True})
-        return self.success(GroupSerializer(group).data)
+        return JsonResponse(data={"success":True, "group": group_id})
 
     def delete(self, request):
-        
+        """
+        Delete Clipping Group API
+        REQUEST FORMAT:
+        {
+            "group_id": 그룹 아이디 (num)
+        }
+        RESPONSE FORMAT:
+        {
+            "success": True/False (boolean)
+        }
+        """
         group_id = request.GET.get("group_id")
         
         if group_id is None:
