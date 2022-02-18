@@ -27,7 +27,7 @@ class Keyword(models.Model):
 
 class Group(models.Model):
     name = models.TextField(unique=True)
-    collect_date = models.BooleanField(default=False)
+    collect_date = models.PositiveSmallIntegerField(default=0)
     # false = yesterday, true = today
     # create_dt = models.DateTimeField(auto_now_add=True)
     # update_dt = models.DateTimeField(auto_now_add=True)

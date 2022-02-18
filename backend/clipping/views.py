@@ -133,12 +133,18 @@ def preview(request):
         keywords = GroupKeyword.objects.filter(group=group).values()
         keyword_list = [keyword["keyword"] for keyword in keywords]
         today = datetime.datetime.now()
-        if group.collect_date:
-            from_date = today.replace(hour=0, minute=0, second=0, microsecond=0)
-            to_date = today
-        else:
-            today = today.replace(hour=0, minute=0, second=0, microsecond=0)
+        today = today.replace(hour=0, minute=0, second=0, microsecond=0)
+        if group.collect_date == 0:
             from_date = today - datetime.timedelta(days=1)
+            to_date = today - datetime.timedelta(microseconds=1)
+        elif group.collect_date == 1:
+            from_date = today
+            to_date = today - datetime.timedelta(microseconds=1)
+        elif group.collect_date == 2:
+            from_date = today - datetime.timedelta(days=7)
+            to_date = today - datetime.timedelta(microseconds=1)
+        elif group.collect_date == 3:
+            from_date = today - datetime.timedelta(days=30)
             to_date = today - datetime.timedelta(microseconds=1)
         
         conn = MongoClient(f'mongodb://{MONGO_USER}:{MONGO_PSWD}@{MONGO_ADDR}:{MONGO_PORT}')
@@ -332,7 +338,7 @@ class ClippingGroupAPI(APIView):
             "user": group에 포함된 user list excel 파일 (file),
             "body":{
                 "name": group name (str),
-                "collect_data": 그룹 수집 기간(F: 어제, T: 당일) (boolean),
+                "collect_data": 그룹 수집 기간(0: 어제, 1: 당일 2: 1주 3: 1달) (int),
                 "keywords":선택한 키워드 목록 (str list),
                 "schedules": 수집 시기 (datetime list)
             } ==> string으로 전달됨, json.loads(data["body"]) 필수

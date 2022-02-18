@@ -96,10 +96,14 @@ function getKeywordOfGroup(group_id){
                 }	
             }
             //뉴스 수집 기간
-            if(collectdate){
+            if(collectdate == 1){
                 collectdate = "당일";
-            }else{
+            }else if(collectdate == 0){
                 collectdate = "어제";
+            }else if(collectdate == 2){
+                collectdate = "1주";
+            }else if(collectdate == 3){
+                collectdate = "1달";
             }
             len = $(".collect-date-btn").length;
             if(len > 0) {
@@ -341,9 +345,13 @@ $("#save-group").click(function(){
     //당일 or 어제
     var collect_date = $('.clicked-collect-date-btn').val();
     if(collect_date=="당일"){
-        collect_date = true;
+        collect_date = 1;
     }else if(collect_date=="어제"){
-        collect_date = false;
+        collect_date = 0;
+    }else if(collect_date=="1주"){
+        collect_date = 2;
+    }else if(collect_date=="1달"){
+        collect_date = 3;
     }
     //스케줄 관련
     var schedules_list = [];
