@@ -9,16 +9,21 @@
     </head>
     <body>
         <div class="header">
-            <input type="text" id="fromDate" placeholder="YYYY-MM-DD">
-            <input type="text" id="toDate" placeholder="YYYY-MM-DD">
+            <input type="text" id="fromDate" placeholder="YYYYMMDD">
+            <input type="text" id="toDate" placeholder="YYYYMMDD">
              <select id="crawl-select">
-                <option value="News">News</option>
-                <option value="Facebook">Facebook</option>
+                 <option value="News">News</option>
+                 <option value="Facebook">Facebook</option>
                  <option value="Instagram">Instagram</option>
-                <option value="Youtube">Youtube</option>
+                 <option value="Youtube">Youtube</option>
 {#                <option value="Twitter">Twitter</option>#}
             </select>
             <button id="start-crawl" class="btn btn-primary">크롤링 즉시 실행</button>
+        </div>
+        <div class="scheduler">
+            <input type="text" id="scheduleHour" placeholder="HH">
+            <input type="text" id="scheduleMinute" placeholder="MM">
+            <button id="change-schedule" class="btn btn-primary">스케줄링 변경</button>
         </div>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
         <script src="{% static 'js/crawler.js' %}"></script>

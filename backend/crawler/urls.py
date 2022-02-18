@@ -10,7 +10,8 @@ app_name = 'crawler'
 
 urlpatterns = [
     re_path(r"^$", TemplateView.as_view(template_name="crawler.html"), name="home"),
-    re_path(r"^api/crawl/", views.crawl, name="crawl")
+    re_path(r"^api/crawl/", views.crawl, name="crawl"),
+    re_path(r"^api/schedule/", views.schedule, name="schedule")
 ]
 
 if settings.DEBUG:

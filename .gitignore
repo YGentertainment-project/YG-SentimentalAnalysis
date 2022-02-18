@@ -27,6 +27,8 @@ backend/data/ssl/*
 backend/data/test_case/*
 !**.gitkeep
 
+db
+
 # DB backup
 *.sql
 apikey.py
