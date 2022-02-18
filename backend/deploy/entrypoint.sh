@@ -1,7 +1,7 @@
 #!/bin/bash
 
 apt update
-apt-get -y install openjdk-8-jdk python-dev python3-dev
+apt-get -y install openjdk-8-jdk python-dev python3-dev curl
 pip3 install konlpy jpype1-py3
 
 bash <(curl -s https://raw.githubusercontent.com/konlpy/konlpy/master/scripts/mecab.sh)

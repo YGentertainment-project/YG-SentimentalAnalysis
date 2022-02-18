@@ -15,4 +15,6 @@ ADD ./backend /app
 
 RUN pip3 install --no-cache-dir -r /app/deploy/requirements.txt
 
+RUN bash /app/deploy/entrypoint.sh
+
 EXPOSE 8000

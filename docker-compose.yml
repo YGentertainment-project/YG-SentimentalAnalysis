@@ -11,7 +11,7 @@ services:
             - MYSQL_HOST=ygenter
             - MYSQL_PORT=3306
             - MYSQL_ROOT_PASSWORD=ygenter
-            - MYSQL_DATABASE=ygenter2
+            - MYSQL_DATABASE=ygenter
             - MYSQL_USER=ygenter
             - MYSQL_PASSWORD=ygenter
         
@@ -40,11 +40,11 @@ services:
             - yg-mariadb
             - yg-mongodb          
         ports:
-            - "0.0.0.0:80:8000"
+            - "0.0.0.0:8082:8000"
         command: >
             sh -c "python3 manage.py makemigrations &&
-                   python3 manage.py migrate mongo &&
-                   python3 manage.py migrate default &&
+                   python3 manage.py migrate --database mongo &&
+                   python3 manage.py migrate --database default &&
                    python3 manage.py runserver 0.0.0.0:8000 --insecure"
 
     yg-rabbitmq:
