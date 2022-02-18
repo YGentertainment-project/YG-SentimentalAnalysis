@@ -161,17 +161,18 @@ def preview(request):
             'sad': '슬퍼요',
             'surprise': '놀랐어요'
         }
-        for keyword in keyword_list:
+        
+        keyword_list = [(keyword, keyword.replace(' ','-')) for keyword in keyword_list]
+        for keyword, keyword_without_space in keyword_list:
             cursor = news_collection.find({'$and':[date_query, {'keyword':{'$eq': keyword}}]}).sort('reaction_sum', -1).limit(10)
+            print(keyword)
             keyword = keyword.replace(' ','-')
-            news_list[keyword] = []
-            news_list[keyword] = list(cursor)
-            for news_item in news_list[keyword]:
+            news_list[keyword_without_space] = list(cursor)
+            for news_item in news_list[keyword_without_space]:
                 news_item['reaction_ko'] = {
                     reaction_ko[reaction_type]:reaction_value 
                     for reaction_type, reaction_value in news_item['reaction'].items()
                 }
-        keyword_list = [keyword.replace(' ','-') for keyword in keyword_list]
         values = {
             'keywords': keyword_list,
             'today': today,

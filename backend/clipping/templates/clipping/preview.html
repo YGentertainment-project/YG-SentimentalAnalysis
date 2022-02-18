@@ -18,14 +18,14 @@
     <div class="nav nav-tabs mb-4" id="nav-tab" role="tablist">
       {% if keywords %}
       {% for keyword in keywords %}
-      <a class="nav-item nav-link" id="nav-home-tab" data-bs-toggle="tab" href="#nav-{{keyword}}" role="tab"
-        aria-controls="nav-{{keyword}}" aria-selected="true">{{keyword}}</a>
+      <a class="nav-item nav-link" id="nav-home-tab" data-bs-toggle="tab" href="#nav-{{keyword.1}}" role="tab"
+        aria-controls="nav-{{keyword.1}}" aria-selected="true">{{keyword.0}}</a>
       {% endfor %}
       {% else %}
       {% endif %}
     </div>
   </nav>
-  <div class="tab-content w-100">
+  <div class="tab-content w-100" style="overflow-y: auto; overflow-x: hidden;">
     {% if news_list %}
     {% for news_keyword, news_items in news_list.items %}
     <div id="nav-{{news_keyword}}" class="tab-pane fade" aria-labelledby="nav-{{news_keyword}}-tab" role="tabpanel">
@@ -35,9 +35,12 @@
         <div class="col mb-4">
           <div class="card text-break">
             <div class="card-body">
-              <span style="font-size: 16px; font-weight: bold;">{{news.title}}</span>
+              <span>
+                <a class="text-decoration-none" href="{{news.url}}" style="font-size: 16px; font-weight: bold;"
+                  target="_blank" rel="noopener noreferrer">{{news.title}}</a>
+              </span>
               <br>
-              <span style="font-size: 14px;">{{news.press}} {{news.reporter}}</span>
+              <span style="font-size: 14px;">{{news.press}} {{news.reporter}}기자</span>
               <br>
               <span class="text-black-50" style="font-size: 14px;">
                 {% for reaction_type, reaction_cnt in news.reaction_ko.items %}
@@ -54,7 +57,8 @@
         </div>
         {% endfor %}
         {% else %}
-        <div class="m-auto text-center" style="font-size: 20px; font-weight: bold;">"{{news_keyword}}" 키워드 관련 뉴스가 없습니다
+        <div class="m-auto text-center" style="font-size: 20px; font-weight: bold;">
+          "{{news_keyword}}" 키워드 관련 뉴스가 없습니다
         </div>
         {% endif %}
       </div>
@@ -63,7 +67,9 @@
     {% else %}
     {% endif %}
   </div>
-
+  <div>
+    NLP Data
+  </div>
   {% endblock content %}
 
 </html>
