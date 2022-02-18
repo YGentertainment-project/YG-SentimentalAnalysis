@@ -9,6 +9,8 @@ from openpyxl import load_workbook
 from openpyxl.writer.excel import save_virtual_workbook
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
+from clipping.NLPDB.NLPData import NLPData
+from clipping.NLPDB.NLPCloud import NLPCloud
 from clipping.serializers import GroupKeywordSerializer, GroupScheduleSerializer, GroupSerializer, GroupUserSerializer
 from utils.api import APIView, validate_serializer
 from .models import Keyword, KeywordGroup, Group, GroupKeyword, GroupSchedule, GroupUser
@@ -161,12 +163,14 @@ def preview(request):
             'surprise': '놀랐어요'
         }
         
+        nlp_dataset = NLPData(from_date, to_date, keyword_list)
+        wordcloud_generator = NLPCloud(nlp_dataset)
+        total_wordcloud = wordcloud_generator.multi_keyword_cloud(keyword_list)
         keyword_list = [(keyword, keyword.replace(' ','-')) for keyword in keyword_list]
         for keyword, keyword_without_space in keyword_list:
             cursor = news_collection.find(
                 {'$and':[date_query, {'keyword':{'$eq': keyword}}]}, 
                 allow_disk_use=True).sort('reaction_sum', -1).limit(10)
-            keyword = keyword.replace(' ','-')
             news_list[keyword_without_space] = list(cursor)
             for news_item in news_list[keyword_without_space]:
                 news_item['reaction_ko'] = {
@@ -179,6 +183,7 @@ def preview(request):
             'from_date': from_date,
             'to_date': to_date,
             'news_list': news_list,
+            'total_wordcloud': total_wordcloud,
             'first_depth' : 'NEWS 클리핑',
             'second_depth': '미리보기',
         }
