@@ -5,30 +5,39 @@
 
 {% block content %}
 <div class="forms">
-  <div class="row_layout" style="justify-content: space-between;">
+  <div class="row_layout mb-4" style="justify-content: space-between;">
     <div class="column_layout" style="text-align: start;">
       <span id="preview_title" style="font-size: 16px;">{{today|date:'Y년 m월 d일'}} 뉴스 클리핑</span>
       <span id="preview_period"
         style="font-size: 12px;">{{from_date|date:'Y-m-d H:i'}}~{{to_date|date:'Y-m-d H:i'}}</span>
     </div>
-    <button class="btn btn-primary" style="margin-top: 10px; font-weight: bold;">바로 발송</button>
+    <button class="btn btn-primary my-auto" style="font-weight: bold;">바로 발송</button>
   </div>
 
   <nav>
-    <div class="nav nav-tabs mb-4" id="nav-tab" role="tablist">
+    <div class="nav nav-tabs mb-2" id="nav-tab" role="tablist">
       {% if keywords %}
       {% for keyword in keywords %}
-      <a class="nav-item nav-link" id="nav-home-tab" data-bs-toggle="tab" href="#nav-{{keyword.1}}" role="tab"
+      {% if forloop.first %}
+      <a class="nav-item nav-link active" id="nav-{{keyword.1}}-tab" data-bs-toggle="tab" href="#nav-{{keyword.1}}" role="tab"
         aria-controls="nav-{{keyword.1}}" aria-selected="true">{{keyword.0}}</a>
+      {% else %}
+      <a class="nav-item nav-link" id="nav-{{keyword.1}}-tab" data-bs-toggle="tab" href="#nav-{{keyword.1}}" role="tab"
+        aria-controls="nav-{{keyword.1}}" aria-selected="true">{{keyword.0}}</a>
+      {% endif %}
       {% endfor %}
       {% else %}
       {% endif %}
     </div>
   </nav>
-  <div class="tab-content w-100" style="overflow-y: auto; overflow-x: hidden;">
+  <div class="tab-content w-100 mb-2" style="overflow-y: auto; overflow-x: hidden; height: 300px;">
     {% if news_list %}
     {% for news_keyword, news_items in news_list.items %}
+    {% if forloop.first %}
+    <div id="nav-{{news_keyword}}" class="tab-pane fade active show" aria-labelledby="nav-{{news_keyword}}-tab" role="tabpanel">
+    {% else %}
     <div id="nav-{{news_keyword}}" class="tab-pane fade" aria-labelledby="nav-{{news_keyword}}-tab" role="tabpanel">
+    {% endif %}
       <div class="row row-cols-2">
         {% if news_items|length > 0 %}
         {% for news in news_items %}
@@ -67,8 +76,13 @@
     {% else %}
     {% endif %}
   </div>
-  <div>
-    NLP Data
+  <div class="row">
+    <div class="col-6">
+      <span>Word Cloud</span>
+    </div>
+    <div class="col-6">
+      Aspect
+    </div>
   </div>
   {% endblock content %}
 

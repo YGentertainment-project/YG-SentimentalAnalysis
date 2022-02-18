@@ -95,7 +95,6 @@ def base(request):
                     for keyword in keywords:
                         keyword_table[keyword.keywordgroup.groupname].append(keyword.keyword)
                     max_column = max([len(keywords) for _, keywords in keyword_table.items()])
-                    print(keyword_table.items())
                     new_wb = openpyxl.Workbook()
                     new_ws = new_wb.active
                     new_ws.cell(1, 1, '키워드')
@@ -164,8 +163,9 @@ def preview(request):
         
         keyword_list = [(keyword, keyword.replace(' ','-')) for keyword in keyword_list]
         for keyword, keyword_without_space in keyword_list:
-            cursor = news_collection.find({'$and':[date_query, {'keyword':{'$eq': keyword}}]}).sort('reaction_sum', -1).limit(10)
-            print(keyword)
+            cursor = news_collection.find(
+                {'$and':[date_query, {'keyword':{'$eq': keyword}}]}, 
+                allow_disk_use=True).sort('reaction_sum', -1).limit(10)
             keyword = keyword.replace(' ','-')
             news_list[keyword_without_space] = list(cursor)
             for news_item in news_list[keyword_without_space]:
@@ -386,7 +386,6 @@ class ClippingGroupAPI(APIView):
                 group = GroupSerializer(exist_data, data=group_data)
                 if group.is_valid():
                     group.save()
-                    print(data["collect_date"])
                 else:
                     return self.error("Update clipping group data is not valid")
         except:
