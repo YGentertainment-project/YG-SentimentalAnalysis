@@ -111,7 +111,6 @@ class IGSpiderMiddleware:
     def from_crawler(cls, crawler):
         s = cls()
         crawler.signals.connect(s.spider_opened, signal=signals.spider_opened)
-        crawler.signals.connect(s.spider_closed, signal=signals.spider_closed)
         return s
 
     def process_spider_input(self, response, spider):
@@ -152,7 +151,6 @@ class IGSpiderMiddleware:
         print(spider.name)
         print(spider.cookie)
         spider.driver.close()
-        spider.driver.quit()
         
 class TwitterSpiderMiddleware:
     @classmethod
@@ -285,17 +283,19 @@ class KeywordSQLMiddleware:
         spider.logger.info(f'Set Connection to Database: Success')
         
         if spider.name == 'News':
-            select_sql_keyword = '''SELECT B.keyword 
+            select_sql_keyword = '''SELECT A.groupname, B.keyword 
                                     FROM collect_target_keyword_group A, collect_target_keyword B
-                                    WHERE news_platform = 1 AND A.id = B.group_id'''
+                                    WHERE news_platform = 1 AND A.id = B.keywordgroup_id'''
         else:
-            select_sql_keyword = '''SELECT B.keyword 
+            select_sql_keyword = '''SELECT A.groupname B.keyword 
                                     FROM collect_target_keyword_group A, collect_target_keyword B
-                                    WHERE sns_platform = 1 AND A.id = B.group_id'''
+                                    WHERE sns_platform = 1 AND A.id = B.keywordgroup_id'''
         cursor.execute(select_sql_keyword)
         rows = cursor.fetchall()
+        spider.keyword_groups = {row['keyword']:row['groupname'] for row in rows}
         spider.keywords = [row['keyword'] for row in rows]
         spider.logger.info(f'Keyword From Database: {spider.keywords}')
+        spider.logger.info(f'Keyword Group From Database: {spider.keyword_groups}')
         
     def spider_closed(self, spider):
         print(spider.name)

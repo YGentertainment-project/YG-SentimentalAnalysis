@@ -12,7 +12,6 @@ NAVER_SEARCH_LINK = 'https://search.naver.com/search.naver'
 NAVER_NEWS_LINK = 'https://entertain.naver.com/read'
 NAVER_REACTION_LINK = 'https://news.like.naver.com/v1/search/contents'
 
-
 class NewsSpider(scrapy.Spider):
     name = 'News'
     custom_settings = {
@@ -25,9 +24,9 @@ class NewsSpider(scrapy.Spider):
         super().__init__(**kwargs)
         self.keywords = []
         for keyword in keywords.split(','):
-            if keyword != '':
+            if keyword != '' :
                 self.keywords.append(keyword)
-
+        
         self.date_filter = False
         if (from_date == '') ^ (to_date == ''):
             print('Error, from_date and to_date must insert together')
@@ -100,7 +99,7 @@ class NewsSpider(scrapy.Spider):
                 meta={'keyword': response.meta["keyword"], 'start': response.meta['start'] + 10},
                 dont_filter=True
             )
-
+    
     def korean_date_to_iso8601(self, korean_date):
         # ex 2021.12.21 오후 1:36
         date_arr = korean_date.split()
@@ -111,7 +110,7 @@ class NewsSpider(scrapy.Spider):
         else:
             date = date.replace(hour=time.hour, minute=time.minute)
         return date
-
+    
     def parse_news_article(self, response):
         soup = bs(response.body, 'html.parser')
         if 'entertain' in response.url:
@@ -135,7 +134,7 @@ class NewsSpider(scrapy.Spider):
         reporter = soup.select_one('.journalistcard_summary_name')
         if reporter is not None:
             reporter = reporter.text.replace('기자', '').strip()
-        else:
+        else: 
             reporter = re.search('[^가-힣][가-힣]{2,4} 기자[^가-힣]', body)
             if reporter is not None:
                 reporter = reporter[0][1:-4]
@@ -159,7 +158,7 @@ class NewsSpider(scrapy.Spider):
             body=body,
             snippet=response.meta['snippet'],
             url=response.url,
-            keyword=response.meta['keyword'],
+            keyword=self.keyword_groups[response.meta['keyword']],
             create_dt=pub_date
         )
         data_cid = soup.select_one('._reactionModule')['data-cid']
@@ -173,7 +172,7 @@ class NewsSpider(scrapy.Spider):
             self.get_article_reaction,
             meta={'item': item}
         )
-
+    
     def get_article_reaction(self, response):
         data = json.loads(response.body[6:-2])
         reactions = {}
@@ -181,4 +180,5 @@ class NewsSpider(scrapy.Spider):
             reactions[reaction['reactionType']] = reaction['count']
         item = response.meta['item']
         item['reaction'] = reactions
+        item['reaction_sum'] = sum(reactions.values())
         yield item

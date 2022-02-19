@@ -29,6 +29,7 @@ class News(dmodels.Model):
     url = dmodels.TextField(null=False)
     keyword = dmodels.CharField(max_length=100, null=False)
     reaction = dmodels.JSONField()
+    reaction_sum = dmodels.IntegerField()
 
 
 class IG(dmodels.Model):
