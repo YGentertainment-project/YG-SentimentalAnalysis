@@ -1,9 +1,6 @@
 FROM pytorch/pytorch:1.10.0-cuda11.3-cudnn8-runtime
 ENV YG_ENV production
 
-ADD ./backend /app
-WORKDIR /app
-
 RUN apt-get update \
     && apt-get install -y wget git\
     && wget http://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_97.0.4692.71-1_amd64.deb
@@ -13,8 +10,6 @@ RUN apt install -y ./google-chrome-stable_97.0.4692.71-1_amd64.deb \
 
 # mysqlclient, gcc, wget, curl 설치
 RUN apt-get install -y python3-dev default-libmysqlclient-dev build-essential gcc wget
-
-ADD ./backend /app
 
 # pip 업그레이드
 RUN cd /usr/local/bin && \
@@ -26,6 +21,7 @@ RUN cd /usr/local/bin && \
 RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
+ADD ./backend /app
 WORKDIR /app
 
 RUN pip install --no-cache-dir -r /app/deploy/requirements.txt
