@@ -11,8 +11,8 @@ RUN apt-get update \
 RUN apt install -y ./google-chrome-stable_97.0.4692.71-1_amd64.deb \
     && apt-get -f install
 
-# mysqlclient 설치
-RUN apt-get install -y python3-dev default-libmysqlclient-dev build-essential gcc
+# mysqlclient, gcc, wget, curl 설치
+RUN apt-get install -y python3-dev default-libmysqlclient-dev build-essential gcc wget
 
 ADD ./backend /app
 
@@ -26,9 +26,6 @@ RUN cd /usr/local/bin && \
 RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-RUN apt-get update \
-    && apt-get install -y wget
-
 WORKDIR /app
 
 RUN pip install --no-cache-dir -r /app/deploy/requirements.txt
@@ -37,6 +34,7 @@ ARG DATA=/data
 RUN mkdir -p ${DATA}/config
 RUN if [ ! -f "${DATA}/config/secret.key" ] ; then echo $(cat /dev/urandom | head -1 | md5sum | head -c 32) > "${DATA}/config/secret.key" ; fi
 
+# mecab 설치 및 사용자 사전 적용
 RUN bash /app/deploy/entrypoint.sh
 
 EXPOSE 8000
