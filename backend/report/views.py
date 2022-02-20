@@ -28,7 +28,7 @@ def preview(request):
 
 def load_data(request):
     conn = MongoClient(f'mongodb://{MONGO_USER}:{MONGO_PSWD}@{MONGO_ADDR}:{MONGO_PORT}')
-    db = conn.crawling_tuto
+    db = conn[MONGO_DB]
     col = db.News
 
     start = int(request.GET['start'])
@@ -95,7 +95,7 @@ def load_data(request):
 def load_preview(request):
     print("load_preview")
     conn = MongoClient(f'mongodb://{MONGO_USER}:{MONGO_PSWD}@{MONGO_ADDR}:{MONGO_PORT}')
-    db = conn.crawling_tuto
+    db = conn[MONGO_DB]
     col = db.News
     start = int(request.GET['start'])
     length = int(request.GET['length'])
