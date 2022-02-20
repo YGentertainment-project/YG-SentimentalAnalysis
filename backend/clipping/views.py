@@ -140,7 +140,7 @@ def preview(request):
             to_date = today - datetime.timedelta(microseconds=1)
         elif group.collect_date == 1:
             from_date = today
-            to_date = today - datetime.timedelta(microseconds=1)
+            to_date = datetime.datetime.now()
         elif group.collect_date == 2:
             from_date = today - datetime.timedelta(days=7)
             to_date = today - datetime.timedelta(microseconds=1)
