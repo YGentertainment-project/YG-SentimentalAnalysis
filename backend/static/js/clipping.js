@@ -1,14 +1,11 @@
+// 00:00:00형태로 반환
 function getTime(minutes, seconds) {
     minutes = parseInt(minutes);
     seconds = parseInt(seconds);
-    //Optional: Add leading zero's
     if (minutes < 10)
         minutes = '0'+minutes;
- 
     if (seconds < 10)
         seconds = '0'+seconds;
- 
-    //Return the current minutes and seconds
     return minutes+':'+seconds+':00';
  }
 
@@ -21,13 +18,13 @@ function getTime(minutes, seconds) {
  });
 
  $("#add-group-form-close").click(function(){
-     // 닫기
+     // popup 닫기
     document.getElementById("add-group-form").style.display = "none";
  });
 
  $("#add-group-form-save").click(function(){
     // 저장 후 팝업 닫기
-    //새로 생겼다는 의미로 id -1 넣어두기
+    // 새로 생겼다는 의미로 id '-1' 넣어두기
     let newButton = $('<input class="group-btn" type="button" value="'+$("#new_group_name").val()+'" id="'+-1+'"></input>');
     newButton.click(function(){
         click_group_function(newButton);
@@ -50,7 +47,7 @@ function getTime(minutes, seconds) {
  });
 
  function click_group_function(widget){
-     //지금 눌려있는 애가 새로운 아이라면
+     //지금 눌려있는 애가 저장되지 않은 새로 만든 그룹이라면
     if($('.clicked-group-btn').attr('id') == -1){
         alert("먼저 새로운 그룹 저장을 해주세요.");
         return;
@@ -78,8 +75,6 @@ function getKeywordOfGroup(group_id){
         datatype: 'json',
         contentType: 'application/json; charset=utf-8',
         success: res => {
-            console.log("success");
-            console.log(res);
             var keywords = res.data["checked_keywords"];
             var collectdate = res.data["collect_date"];
             var schedules = res.data["schedule"];
@@ -122,8 +117,6 @@ function getKeywordOfGroup(group_id){
             }
         },
         error: e => {
-            console.log("=======error-------")
-            // var result = JSON.parse(e.responseText);
             if(e.responseText["data"] != null)
                 alert(e.responseText["data"]);
             else
@@ -156,7 +149,7 @@ function getNewKeywordOfGroup(){
     $('#receiver_download_group_id').val("");
 }
 
-//키워드 버튼 누르면 변하도록
+//키워드 버튼 누르면 클릭된 상태가 되도록
  $(".keyword-btn").click(function(){
     if($(this).hasClass("clicked-keyword-btn")){
         $(this).removeClass("clicked-keyword-btn");
@@ -165,7 +158,7 @@ function getNewKeywordOfGroup(){
     }
  });
 
- //뉴스 수집 기간 누르면 변하도록
+ //뉴스 수집 기간 누르면 클릭된 상태가 되도록
  $(".collect-date-btn").click(function(){
     if($(this).hasClass("clicked-collect-date-btn")){
         $(this).removeClass("clicked-collect-date-btn");
@@ -329,7 +322,6 @@ function getNewKeywordOfGroup(){
 
   //그룹 저장(api 연결)
 $("#save-group").click(function(){
-    console.log("그룹 저장");
     //그룹 이름
     var group_name = $('.clicked-group-btn').val();
     //키워드들
@@ -338,7 +330,6 @@ $("#save-group").click(function(){
     var keywords_list = [];
 	if(len > 0) {
 		for(var i = 0; i < len; i++) {
-            console.log($($('.clicked-keyword-btn')[i]).val());
             keywords_list.push($($('.clicked-keyword-btn')[i]).val());
 		}	
 	}
@@ -359,8 +350,6 @@ $("#save-group").click(function(){
 	len = hours.length;
 	if(len > 0) {
 		for(var i = 0; i < len; i++) {
-            //$($('.schedule-hour')[i]).val()
-            //$($('.schedule-minute')[i]).val()
             schedules_list.push(getTime($($('.schedule-hour')[i]).val(), $($('.schedule-minute')[i]).val()));
 		}
 	}
@@ -372,21 +361,16 @@ $("#save-group").click(function(){
         "name": group_name,
 	    "keywords": keywords_list,
 	    "collect_date": collect_date,//boolean
-	    // "users": file,//file형태로 전달
 	    "schedules":schedules_list
     }
-    console.log(data);
     var len = $(".clicked-group-btn").length;
 
-    //file 때문에 form-data로 보내기
+    // form-data로 보내기
     let file = document.getElementById("receiver-upload").files[0];
     let formData = new FormData(); 
     formData.append("users", file);
-    // 다른 parameter들은 body에 묶어 보내기
-    let body = JSON.stringify(data);
+    // 다른 parameter들은 body로 묶어 보내기
     formData.append("body", JSON.stringify(data));
-    console.log("===formData===");
-    console.log(formData);
     $.ajax({
         url: '/clipping/clipgroup/',
         data: formData,
@@ -398,7 +382,6 @@ $("#save-group").click(function(){
             $('.clicked-group-btn').attr('id', res.group);
         },
         error: e => {
-            console.log(e.responseText);
             if(e.responseText["data"] != null)
                 alert(e.responseText["data"]);
             else
@@ -411,8 +394,6 @@ $("#save-group").click(function(){
   //그룹 삭제(api 연결)
   $("#delete-group").click(function(){
     var group_id = $('.clicked-group-btn').attr('id');
-    console.log("====group_id====");
-    console.log(group_id);
     if(group_id == undefined){
         alert("삭제할 그룹을 선택해주세요.");
     }
@@ -426,7 +407,6 @@ $("#save-group").click(function(){
         var data = {
             "group_id": group_id
         };
-        console.log(data);
         $.ajax({
             url: '/clipping/clipgroup/?' + $.param({
                 group_id: group_id
@@ -439,13 +419,6 @@ $("#save-group").click(function(){
                 location.reload();
             },
             error: e => {
-                // console.log(e.responseText);
-                // console.log(e.data);
-                // alert(e.data);
-                // alert(e.responseText);
-                // location.reload();
-                console.log("=======error-------")
-                // var result = JSON.parse(e.responseText);
                 if(e.responseText["data"] != null)
                     alert(e.responseText["data"]);
                 else
@@ -474,7 +447,6 @@ $('#keyword-uplaod-btn').click(function (){
             alert("저장되었습니다.");
         },
         error: e => {
-            console.log(e.responseText);
             if(e.responseText["data"] != null)
                 alert(e.responseText["data"]);
             else
@@ -495,7 +467,7 @@ document.querySelector("#receiver-download-btn").addEventListener("click", funct
 
 //미리보기 화면으로 이동
 $("#go-to-preview").click(function(){
-     //지금 눌려있는 애가 새로운 아이라면
+     //지금 눌려있는 애가 저장되지 않은 새로운 그룹이라면
     if($('.clicked-group-btn').attr('id') == -1){
         alert("먼저 새로운 그룹 저장을 해주세요.");
         return;

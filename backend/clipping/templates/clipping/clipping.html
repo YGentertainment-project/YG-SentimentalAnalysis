@@ -26,7 +26,6 @@
                 <input type="button" class="border-btn" id="keyword-uplaod-btn" value="엑셀 업로드">
                 <input id="keyword-upload" class="form-control" type="file" name="KeywordFile" style="width: 300px;">
             </div>
-            <!-- 엑셀 다운로드 연동 필요 -->
             <form method="post" action="{%url 'clipping:base' %}" enctype="multipart/form-data">
                 {% csrf_token %}
                 <button class="border-btn"
@@ -91,7 +90,6 @@
                 <div class="keyword-board" style="width: 60% !important;">
                     <div class="row_layout child-margin-5">
                         <span style="font-weight: bold; font-size: 14px;">엑셀 업로드: </span>
-                        <!-- <button class="border-btn">엑셀 업로드</button> -->
                         <input id="receiver-upload" class="form-control" type="file" name="users" style="width: 300px;">
                     </div>
                     <form method="post" action="{%url 'clipping:base' %}" enctype="multipart/form-data">
@@ -117,7 +115,6 @@
             <div style="margin-top: 10px;">
                 <div class="row_layout">
                     <span class="subtitle">메일 발송 설정</span>
-                    <!-- <input checked type="checkbox" style="margin-top: 3px; margin-left: 8px;"></input> -->
                 </div>
                 <table class="table table-centered table-nowrap mb-0 rounded" style="width: 40%;">
                     <thead class="thead-dark" style="text-align: center !important; font-weight: bold;">
