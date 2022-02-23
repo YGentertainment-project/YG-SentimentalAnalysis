@@ -131,28 +131,37 @@ def preview(request):
         group = Group.objects.filter(id=group_id).first()
         if group is None:
             return JsonResponse(data={"fail":False, "data": "Clipping Group does not exist"})
+        # 클리핑 그룹의 키워드 목록 수집
         keywords = GroupKeyword.objects.filter(group=group).values()
         keyword_list = [keyword["keyword"] for keyword in keywords]
+        
+        # 클리핑 그룹 기간 설정
         today = datetime.datetime.now()
         today = today.replace(hour=0, minute=0, second=0, microsecond=0)
+        # 전일
         if group.collect_date == 0:
             from_date = today - datetime.timedelta(days=1)
             to_date = today - datetime.timedelta(microseconds=1)
+        # 당일
         elif group.collect_date == 1:
             from_date = today
             to_date = datetime.datetime.now()
+        # 1주
         elif group.collect_date == 2:
             from_date = today - datetime.timedelta(days=7)
             to_date = today - datetime.timedelta(microseconds=1)
+        # 1달
         elif group.collect_date == 3:
             from_date = today - datetime.timedelta(days=30)
             to_date = today - datetime.timedelta(microseconds=1)
+        # MongoDB 기간 쿼리
+        date_query = {'create_dt': {'$gte': from_date, '$lt': to_date}}
         
+        # MongoDB 연결
         conn = MongoClient(f'mongodb://{MONGO_USER}:{MONGO_PSWD}@{MONGO_ADDR}:{MONGO_PORT}')
         news_collection = conn[MONGO_DB]['News']
         
-        date_query = {'create_dt': {'$gte': from_date, '$lt': to_date}}
-        
+        # 뉴스 반응 한국어 변환 테이블
         reaction_ko = {
             'cheer': '응원해요',
             'congrats': '축하해요',
@@ -161,6 +170,7 @@ def preview(request):
             'sad': '슬퍼요',
             'surprise': '놀랐어요'
         }
+        # Aspect 한국어 변환 테이블
         asp_ko = {
             'SAB': '가창력',
             'ETC': '기타',
@@ -184,8 +194,9 @@ def preview(request):
             'BTY': '뷰티'
         }
         
-        
+        # 클리핑 기간에 해당하는 NLP 데이터 수집
         nlp_dataset = NLPData(from_date, to_date, keyword_list)
+        # 워드 클라우드 제작용 Frequency 계산
         wordcloud_generator = NLPCloud(nlp_dataset)
         
         data_by_keyword = {keyword:{'keyword_wo_space': keyword.replace(' ','-')} for keyword in keyword_list}
@@ -204,14 +215,27 @@ def preview(request):
             data_by_keyword[keyword]['freq_data'] = wordcloud_generator.single_keyword_cloud(keyword)
             # 감성 분석 데이터
             data_by_keyword[keyword]['absa'] = {}
+            # NLP 데이터에서 문서 순회
             for nlp_data in nlp_dataset.data[keyword]:
+                # 문서내 문장 순회
                 for tag_list in nlp_data['ABSA']:
+                    # 문장별 ABSA 태그 순회
+                    # asp_tag_type: ASP-OPN 쌍에서 ASP 태그의 종류
+                    # asp_tag_text: ASP-OPN 쌍에서 ASP에 해당하는 텍스트
+                    # opn_text: ASP-OPN 쌍에서 OPN에 해당하는 텍스트
                     for asp_tag_type, asp_tag_text, opn_text in tag_list:
+                        # ASP-ETC 형식에서 ETC만 추출하여 한국어 변환
                         asp_tag_type = asp_ko[asp_tag_type[4:7]]
+                        # data_by_keyword[keyword]['absa']는 ASP 태그를 Key로 하는 Dict
+                        # Value는 Tuple(int, Dict[str:int]) 전체 등장 횟수, 각 OPN 별 등장 횟수
                         if asp_tag_type not in data_by_keyword[keyword]['absa']:
-                            data_by_keyword[keyword]['absa'][asp_tag_type] = [0, set()]
+                            data_by_keyword[keyword]['absa'][asp_tag_type] = [0, {}]
                         data_by_keyword[keyword]['absa'][asp_tag_type][0] += 1
-                        data_by_keyword[keyword]['absa'][asp_tag_type][1].add(opn_text)
+                        if opn_text not in data_by_keyword[keyword]['absa'][asp_tag_type][1]:
+                            data_by_keyword[keyword]['absa'][asp_tag_type][1][opn_text] = 0
+                        data_by_keyword[keyword]['absa'][asp_tag_type][1][opn_text] += 1
+            # ASP 태그를 등장 횟수에 따라 내림차순 정렬
+            data_by_keyword[keyword]['absa'] = sorted(data_by_keyword[keyword]['absa'].items(), key=lambda x: x[1][0], reverse=True)
         values = {
             'today': today,
             'from_date': from_date,
