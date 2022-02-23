@@ -82,9 +82,11 @@
                   aria-controls="nav-wc-ner" aria-selected="true">NER</a>
                 <a class="nav-item nav-link mx-1" id="nav-wc-pos-tab" data-bs-toggle="tab" href="#nav-wc-pos" role="tab"
                   aria-controls="nav-wc-pos" aria-selected="true">POS</a>
+                <a class="nav-item nav-link mx-1" id="nav-wc-ner-table-tab" data-bs-toggle="tab" href="#nav-wc-ner-table" role="tab"
+                  aria-controls="nav-wc-ner-table" aria-selected="true">개체명</a>
               </div>
             </nav>
-            <div class="tab-content w-100 mb-2 d-flex justify-content-center" style="overflow: hidden; height: 300px;">
+            <div class="tab-content mb-2 d-flex justify-content-center" style="overflow: hidden; height: 300px;">
               <div id="nav-wc-mix" class="tab-pane fade active show" aria-labelledby="nav-wc-mix-tab" role="tabpanel">
                 {{data.freq_data.MIX|safe}}
               </div>
@@ -94,28 +96,52 @@
               <div id="nav-wc-pos" class="tab-pane fade" aria-labelledby="nav-wc-pos-tab" role="tabpanel">
                 {{data.freq_data.POS|safe}}
               </div>
+              <div id="nav-wc-ner-table" class="tab-pane fade w-100 overflow-auto" aria-labelledby="nav-wc-ner-table-tab" role="tabpanel">
+                <table class="table table-centered table-nowrap rounded">
+                  <thead class="thead-light">
+                    <tr>
+                      <th>개체명</th>
+                      <th>#</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for tag in data.freq_data.NER %}
+                    <tr>
+                      <td>{{tag.0}}</td>
+                      <td>{{tag.1}}</td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
           <div class="col-6">
             <span class="mb-2" style="font-size: 16px; font-weight: bold;">감성분석</span>
-            <table class="table table-centered table-nowrap rounded">
-              <thead class="thead-light">
-                <tr>
-                  <th>Aspect</th>
-                  <th>#</th>
-                  <th>Opinion</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for aspect, opn_cnt in data.absa %}
-                <tr>
-                  <td>{{aspect}}</td>
-                  <td>{{opn_cnt.0}}</td>
-                  <td>{{opn_cnt.1}}</td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
+            <div class="table-responsive">
+              <table class="table table-centered table-nowrap rounded">
+                <thead class="thead-light">
+                  <tr>
+                    <th>Aspect</th>
+                    <th>#</th>
+                    <th>Opinion</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for aspect, opn_list in data.absa %}
+                  <tr>
+                    <td>{{aspect}}</td>
+                    <td>{{opn_list.0}}</td>
+                    <td>
+                      {% for opn, opn_cnt in opn_list.1.items %}
+                      {{opn}}
+                      {% endfor %}
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>

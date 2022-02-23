@@ -62,14 +62,13 @@ class NLPCloud:
                 'POS': '{}'
             }
         #POS
-        pos_counter = dict(Counter(POS_words))
+        pos_counter = sorted(dict(Counter(POS_words)).items(), key=lambda x: x[1], reverse=True)
         
         #NER
-        ner_counter = dict(Counter(NER_words))
+        ner_counter = sorted(dict(Counter(NER_words)).items(), key=lambda x: x[1], reverse=True)
 
         #MIX
-        mix_counter = dict(Counter(NER_words + POS_words))
-
+        mix_counter = sorted(dict(Counter(POS_words + NER_words)).items(), key=lambda x: x[1], reverse=True)
         return {
             'MIX': mix_counter,
             'NER': ner_counter,
@@ -103,13 +102,13 @@ class NLPCloud:
                 'POS': '{}'
             }
         #POS
-        pos_counter = dict(Counter(POS_words))
+        pos_counter = sorted(dict(Counter(POS_words)).items(), key=lambda x: x[1], reverse=True)
         
         #NER
-        ner_counter = dict(Counter(NER_words))
+        ner_counter = sorted(dict(Counter(NER_words)).items(), key=lambda x: x[1], reverse=True)
 
         #MIX
-        mix_counter = dict(Counter(NER_words + POS_words))
+        mix_counter = sorted(dict(Counter(POS_words + NER_words)).items(), key=lambda x: x[1], reverse=True)
 
         return {
             'MIX': mix_counter,
