@@ -150,7 +150,7 @@ class NewsSpider(scrapy.Spider):
         pub_date = self.korean_date_to_iso8601(pub_date)
         _, (oid, aid) = self.url_checker(response.url)
         item = NewsItem(
-            # _id=f'{oid}_{aid}',
+            _id=f'{oid}_{aid}',
             data_id=f'{oid}_{aid}',
             press=press,
             reporter=reporter,
