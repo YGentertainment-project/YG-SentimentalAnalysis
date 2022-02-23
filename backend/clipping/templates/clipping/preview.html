@@ -16,95 +16,97 @@
 
   <nav>
     <div class="nav nav-tabs mb-2" id="nav-tab" role="tablist">
-      {% if keywords %}
-      {% for keyword in keywords %}
+      {% if data_by_keyword %}
+      {% for keyword, data in data_by_keyword.items %}
       {% if forloop.first %}
-      <a class="nav-item nav-link active mx-1" id="nav-{{keyword.1}}-tab" data-bs-toggle="tab" href="#nav-{{keyword.1}}"
-        role="tab" aria-controls="nav-{{keyword.1}}" aria-selected="true">{{keyword.0}}</a>
+      <a class="nav-item nav-link active mx-1" id="nav-{{data.keyword_wo_space}}-tab" data-bs-toggle="tab" href="#nav-{{data.keyword_wo_space}}"
+        role="tab" aria-controls="nav-{{data.keyword_wo_space}}" aria-selected="true">{{keyword}}</a>
       {% else %}
-      <a class="nav-item nav-link mx-1" id="nav-{{keyword.1}}-tab" data-bs-toggle="tab" href="#nav-{{keyword.1}}" role="tab"
-        aria-controls="nav-{{keyword.1}}" aria-selected="true">{{keyword.0}}</a>
+      <a class="nav-item nav-link mx-1" id="nav-{{data.keyword_wo_space}}-tab" data-bs-toggle="tab" href="#nav-{{data.keyword_wo_space}}"
+        role="tab" aria-controls="nav-{{data.keyword_wo_space}}" aria-selected="true">{{keyword}}</a>
       {% endif %}
       {% endfor %}
       {% else %}
       {% endif %}
     </div>
   </nav>
-  <div class="tab-content w-100 mb-4" style="overflow-y: auto; overflow-x: hidden; height: 300px;">
-    {% if news_list %}
-    {% for news_keyword, news_items in news_list.items %}
-    {% if forloop.first %}
-    <div id="nav-{{news_keyword}}" class="tab-pane fade active show" aria-labelledby="nav-{{news_keyword}}-tab"
-      role="tabpanel">
-      {% else %}
-      <div id="nav-{{news_keyword}}" class="tab-pane fade" aria-labelledby="nav-{{news_keyword}}-tab" role="tabpanel">
+  <div class="tab-content w-100 mb-4">
+    {% if data_by_keyword %}
+      {% for keyword, data in data_by_keyword.items %}
+        {% if forloop.first %}
+          <div id="nav-{{data.keyword_wo_space}}" class="tab-pane fade active show" aria-labelledby="nav-{{data.keyword_wo_space}}-tab" role="tabpanel">
+        {% else %}
+          <div id="nav-{{data.keyword_wo_space}}" class="tab-pane fade" aria-labelledby="nav-{{data.keyword_wo_space}}-tab" role="tabpanel">
         {% endif %}
-        <div class="row row-cols-2">
-          {% if news_items|length > 0 %}
-          {% for news in news_items %}
-          <div class="col mb-2">
-            <div class="card text-break">
-              <div class="card-body">
-                <span>
-                  <a class="text-decoration-none" href="{{news.url}}" style="font-size: 16px; font-weight: bold;"
-                    target="_blank" rel="noopener noreferrer">{{news.title}}</a>
-                </span>
-                <br>
-                <span style="font-size: 14px;">{{news.press}} {{news.reporter}}기자</span>
-                <br>
-                <span class="text-black-50" style="font-size: 14px;">
-                  {% for reaction_type, reaction_cnt in news.reaction_ko.items %}
-                  {{reaction_type}}: {{reaction_cnt}}
-                  {% endfor %}
-                </span>
-                {% if news.reaction_ko.items|length > 0 %}
-                <br>
-                {% else %}
-                {% endif %}
-                <span style="font-size: 14px;">{{news.snippet}}</span>
+        <div class="row row-cols-2 mb-4" style="overflow-y: auto; overflow-x: hidden; height: 300px;">
+          {% if data.news_list|length > 0 %}
+            {% for news in data.news_list %}
+              <div class="col mb-2">
+                <div class="card text-break">
+                  <div class="card-body">
+                    <span>
+                      <a class="text-decoration-none" href="{{news.url}}" style="font-size: 16px; font-weight: bold;"
+                        target="_blank" rel="noopener noreferrer">{{news.title}}</a>
+                    </span>
+                    <br>
+                    <span style="font-size: 14px;">{{news.press}} {{news.reporter}}기자</span>
+                    <br>
+                    <span class="text-black-50" style="font-size: 14px;">
+                      {% for reaction_type, reaction_cnt in news.reaction_ko.items %}
+                        {{reaction_type}}: {{reaction_cnt}}
+                      {% endfor %}
+                    </span>
+                    {% if news.reaction_ko.items|length > 0 %}
+                      <br>
+                    {% else %}
+                    {% endif %}
+                    <span style="font-size: 14px;">{{news.snippet}}</span>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+            {% else %}
+              <div class="m-auto text-center" style="font-size: 20px; font-weight: bold;">
+                "{{keyword}}" 키워드 관련 뉴스가 없습니다
+              </div>
+            {% endif %}
+        </div>
+        <div class="row">
+          <div class="col-6">
+            <span style="font-size: 16px; font-weight: bold;">워드클라우드</span>
+            <nav>
+              <div class="nav nav-tabs mb-2" id="nav-wc-tab" role="tablist">
+                <a class="nav-item nav-link active mx-1" id="nav-wc-mix-tab" data-bs-toggle="tab" href="#nav-wc-mix"
+                  role="tab" aria-controls="nav-wc-mix" aria-selected="true">Mix</a>
+                <a class="nav-item nav-link mx-1" id="nav-wc-ner-tab" data-bs-toggle="tab" href="#nav-wc-ner" role="tab"
+                  aria-controls="nav-wc-ner" aria-selected="true">NER</a>
+                <a class="nav-item nav-link mx-1" id="nav-wc-pos-tab" data-bs-toggle="tab" href="#nav-wc-pos" role="tab"
+                  aria-controls="nav-wc-pos" aria-selected="true">POS</a>
+              </div>
+            </nav>
+            <div class="tab-content w-100 mb-2 d-flex justify-content-center" style="overflow: hidden; height: 300px;">
+              <div id="nav-wc-mix" class="tab-pane fade active show" aria-labelledby="nav-wc-mix-tab" role="tabpanel">
+                {{data.freq_data.MIX|safe}}
+              </div>
+              <div id="nav-wc-ner" class="tab-pane fade" aria-labelledby="nav-wc-ner-tab" role="tabpanel">
+                {{data.freq_data.NER|safe}}
+              </div>
+              <div id="nav-wc-pos" class="tab-pane fade" aria-labelledby="nav-wc-pos-tab" role="tabpanel">
+                {{data.freq_data.POS|safe}}
               </div>
             </div>
           </div>
-          {% endfor %}
-          {% else %}
-          <div class="m-auto text-center" style="font-size: 20px; font-weight: bold;">
-            "{{news_keyword}}" 키워드 관련 뉴스가 없습니다
+          <div class="col-6">
+            <span style="font-size: 16px; font-weight: bold;">감성분석</span>
+            <br>
+            {{data.absa}}
           </div>
-          {% endif %}
         </div>
       </div>
       {% endfor %}
       {% else %}
       {% endif %}
     </div>
-    <div class="row">
-      <div class="col-6">
-        <span style="font-size: 16px; font-weight: bold;">워드클라우드</span>
-        <nav>
-          <div class="nav nav-tabs mb-2" id="nav-wc-tab" role="tablist">
-            <a class="nav-item nav-link active mx-1" id="nav-wc-mix-tab" data-bs-toggle="tab" href="#nav-wc-mix" role="tab"
-              aria-controls="nav-wc-mix" aria-selected="true">Mix</a>
-            <a class="nav-item nav-link mx-1" id="nav-wc-ner-tab" data-bs-toggle="tab" href="#nav-wc-ner" role="tab"
-              aria-controls="nav-wc-ner" aria-selected="true">NER</a>
-            <a class="nav-item nav-link mx-1" id="nav-wc-pos-tab" data-bs-toggle="tab" href="#nav-wc-pos" role="tab"
-              aria-controls="nav-wc-pos" aria-selected="true">POS</a>
-          </div>
-        </nav>
-        <div class="tab-content w-100 mb-2 d-flex justify-content-center" style="overflow: hidden; height: 300px;">
-          <div id="nav-wc-mix" class="tab-pane fade active show" aria-labelledby="nav-wc-mix-tab" role="tabpanel">
-            {{total_wordcloud.MIX|safe}}
-          </div>
-          <div id="nav-wc-ner" class="tab-pane fade" aria-labelledby="nav-wc-ner-tab" role="tabpanel">
-            {{total_wordcloud.NER|safe}}
-          </div>
-          <div id="nav-wc-pos" class="tab-pane fade" aria-labelledby="nav-wc-pos-tab" role="tabpanel">
-            {{total_wordcloud.POS|safe}}
-          </div>
-        </div>
-      </div>
-      <div class="col-6">
-        Aspect
-      </div>
-    </div>
-    {% endblock content %}
+{% endblock content %}
+
 </html>
