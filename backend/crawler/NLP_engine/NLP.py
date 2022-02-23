@@ -727,7 +727,7 @@ class NLP_Engine:
                         if prev_tag:
                             tag_list[-1][0] += ' '
                         else:
-                            tag_list.append(['', id2label[str(pred[s + 1])]])
+                            tag_list.append(['', id2label[str(pred[s + 1])], eojeol_id + 1])
                         tag_list[-1][0] += tag_str
             asp_opn_list.append(tag_list)
         return_list = []
