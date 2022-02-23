@@ -462,8 +462,8 @@ class NLP_Engine:
         tokenizer (BertTokenizer): Bert Tokenizer for ner, absa model
     '''
     def __init__(self,
-                 ner_model_path='./ner_model',
-                 absa_model_path='./absa_model',
+                 ner_model_path='clipping/NLP_engine/ner_model',
+                 absa_model_path='clipping/NLP_engine/absa_model',
                  device="cuda" if torch.cuda.is_available() else "cpu"
                 ) -> None:
         '''
