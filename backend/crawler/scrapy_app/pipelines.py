@@ -1,4 +1,5 @@
 import pymongo
+from pymongo.errors import BulkWriteError
 import sshtunnel
 
 from .apikey import *
@@ -27,8 +28,11 @@ class MongoDBPipelines:
         self.buffer[spider.name].append(dict(item))
         
         if len(self.buffer[spider.name]) == self.BUF_SIZE:
-            self.db[spider.name].insert_many(self.buffer[spider.name])
-            del self.buffer[spider.name]
+            try:
+                self.db[spider.name].insert_many(self.buffer[spider.name])
+                del self.buffer[spider.name]
+            except BulkWriteError as e:
+                pass
         return item
     
     def close_spider(self, spider):

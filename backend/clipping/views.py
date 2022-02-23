@@ -46,8 +46,9 @@ def base(request):
         type = request.POST['type']
         if type == 'receiver_download':
             '''
-            export to excel (receiver download)
+            export to excel (mail receiver download)
             '''
+            print("export to excel (mail receiver download)")
             group_id = request.POST.get('group_id', None) #그룹 id
             try:
                 group = Group.objects.filter(id=group_id).first()
