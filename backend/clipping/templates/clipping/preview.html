@@ -76,25 +76,22 @@
             <span class="mb-2" style="font-size: 16px; font-weight: bold;">워드클라우드</span>
             <nav>
               <div class="nav nav-tabs mb-2" id="nav-wc-tab" role="tablist">
-                <a class="nav-item nav-link active mx-1" id="nav-wc-mix-tab" data-bs-toggle="tab" href="#nav-wc-mix"
-                  role="tab" aria-controls="nav-wc-mix" aria-selected="true">Mix</a>
-                <a class="nav-item nav-link mx-1" id="nav-wc-ner-tab" data-bs-toggle="tab" href="#nav-wc-ner" role="tab"
-                  aria-controls="nav-wc-ner" aria-selected="true">NER</a>
-                <a class="nav-item nav-link mx-1" id="nav-wc-pos-tab" data-bs-toggle="tab" href="#nav-wc-pos" role="tab"
-                  aria-controls="nav-wc-pos" aria-selected="true">POS</a>
+                <a class="nav-item nav-link active mx-1" id="nav-wc-mix-{{data.keyword_wo_space}}-tab" data-bs-toggle="tab" href="#nav-wc-mix-{{data.keyword_wo_space}}"
+                  role="tab" aria-controls="nav-wc-mix-{{data.keyword_wo_space}}" aria-selected="true">Mix</a>
+                <a class="nav-item nav-link mx-1" id="nav-wc-ner-{{data.keyword_wo_space}}-tab" data-bs-toggle="tab" href="#nav-wc-ner-{{data.keyword_wo_space}}" role="tab"
+                  aria-controls="nav-wc-ner-{{data.keyword_wo_space}}" aria-selected="true">NER</a>
+                <a class="nav-item nav-link mx-1" id="nav-wc-pos-{{data.keyword_wo_space}}-tab" data-bs-toggle="tab" href="#nav-wc-pos-{{data.keyword_wo_space}}" role="tab"
+                  aria-controls="nav-wc-pos-{{data.keyword_wo_space}}" aria-selected="true">POS</a>
                 <a class="nav-item nav-link mx-1" id="nav-wc-ner-table-tab" data-bs-toggle="tab" href="#nav-wc-ner-table" role="tab"
                   aria-controls="nav-wc-ner-table" aria-selected="true">개체명</a>
               </div>
             </nav>
             <div class="tab-content mb-2 d-flex justify-content-center" style="overflow: hidden; height: 300px;">
-              <div id="nav-wc-mix" class="tab-pane fade active show" aria-labelledby="nav-wc-mix-tab" role="tabpanel">
-                {{data.freq_data.MIX|safe}}
+              <div id="nav-wc-mix-{{data.keyword_wo_space}}" class="tab-pane fade wc-tab active show" aria-labelledby="nav-wc-mix-tab" role="tabpanel" wc-data="{{data.freq_data.MIX|safe}}">
               </div>
-              <div id="nav-wc-ner" class="tab-pane fade" aria-labelledby="nav-wc-ner-tab" role="tabpanel">
-                {{data.freq_data.NER|safe}}
+              <div id="nav-wc-ner-{{data.keyword_wo_space}}" class="tab-pane fade wc-tab" aria-labelledby="nav-wc-ner-tab" role="tabpanel" wc-data="{{data.freq_data.NER|safe}}">
               </div>
-              <div id="nav-wc-pos" class="tab-pane fade" aria-labelledby="nav-wc-pos-tab" role="tabpanel">
-                {{data.freq_data.POS|safe}}
+              <div id="nav-wc-pos-{{data.keyword_wo_space}}" class="tab-pane fade wc-tab" aria-labelledby="nav-wc-pos-tab" role="tabpanel" wc-data="{{data.freq_data.POS|safe}}">
               </div>
               <div id="nav-wc-ner-table" class="tab-pane fade w-100 overflow-auto" aria-labelledby="nav-wc-ner-table-tab" role="tabpanel">
                 <table class="table table-centered table-nowrap rounded">
