@@ -73,7 +73,7 @@
         </div>
         <div class="row">
           <div class="col-6">
-            <span style="font-size: 16px; font-weight: bold;">워드클라우드</span>
+            <span class="mb-2" style="font-size: 16px; font-weight: bold;">워드클라우드</span>
             <nav>
               <div class="nav nav-tabs mb-2" id="nav-wc-tab" role="tablist">
                 <a class="nav-item nav-link active mx-1" id="nav-wc-mix-tab" data-bs-toggle="tab" href="#nav-wc-mix"
@@ -97,9 +97,25 @@
             </div>
           </div>
           <div class="col-6">
-            <span style="font-size: 16px; font-weight: bold;">감성분석</span>
-            <br>
-            {{data.absa}}
+            <span class="mb-2" style="font-size: 16px; font-weight: bold;">감성분석</span>
+            <table class="table table-centered table-nowrap rounded">
+              <thead class="thead-light">
+                <tr>
+                  <th>Aspect</th>
+                  <th>#</th>
+                  <th>Opinion</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for aspect, opn_cnt in data.absa %}
+                <tr>
+                  <td>{{aspect}}</td>
+                  <td>{{opn_cnt.0}}</td>
+                  <td>{{opn_cnt.1}}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
