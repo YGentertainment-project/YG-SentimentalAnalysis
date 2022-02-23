@@ -161,6 +161,29 @@ def preview(request):
             'sad': '슬퍼요',
             'surprise': '놀랐어요'
         }
+        asp_ko = {
+            'SAB': '가창력',
+            'ETC': '기타',
+            'FIG': '몸매',
+            'REA': '반응',
+            'VIB': '분위기',
+            'PIC': '사진',
+            'SOC': '사회성',
+            'CHR': '안무',
+            'ALB': '앨범',
+            'FAC': '얼굴',
+            'ACT': '연기력',
+            'MSC': '음악',
+            'EVT': '이벤트',
+            'ART': '작품성',
+            'TMW': '팀워크',
+            'FSH': '패션', 
+            'PER': '퍼포먼스',
+            'POS': '포즈',
+            'EXP': '표정',
+            'BTY': '뷰티'
+        }
+        
         
         nlp_dataset = NLPData(from_date, to_date, keyword_list)
         wordcloud_generator = NLPCloud(nlp_dataset)
@@ -184,7 +207,7 @@ def preview(request):
             for nlp_data in nlp_dataset.data[keyword]:
                 for tag_list in nlp_data['ABSA']:
                     for asp_tag_type, asp_tag_text, opn_text in tag_list:
-                        asp_tag_type = asp_tag_type[4:7]
+                        asp_tag_type = asp_ko[asp_tag_type[4:7]]
                         if asp_tag_type not in data_by_keyword[keyword]['absa']:
                             data_by_keyword[keyword]['absa'][asp_tag_type] = [0, set()]
                         data_by_keyword[keyword]['absa'][asp_tag_type][0] += 1
@@ -217,7 +240,6 @@ class KeywordAPI(APIView):
                 for keyword in keywords:
                     keyword_table[keyword.keywordgroup.groupname].append(keyword.keyword)
                 max_column = max([len(keywords) for _, keywords in keyword_table.items()])
-                print(keyword_table.items())
                 new_wb = openpyxl.Workbook()
                 new_ws = new_wb.active
                 new_ws.cell(1, 1, '키워드')
@@ -366,7 +388,6 @@ class ClippingGroupAPI(APIView):
         }
         '''
         data = request.POST
-        print(data)
         create_user_flag = False
 
         # 'not in data' means 'in FILES', so there is an attached file
