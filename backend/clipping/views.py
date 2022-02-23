@@ -9,8 +9,7 @@ from openpyxl import load_workbook
 from openpyxl.writer.excel import save_virtual_workbook
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
-from clipping.NLPDB.NLPData import NLPData
-from clipping.NLPDB.NLPCloud import NLPCloud
+from clipping.NLPDB.NLPData import NLPData, NLPCloud
 from clipping.serializers import GroupKeywordSerializer, GroupScheduleSerializer, GroupSerializer, GroupUserSerializer
 from utils.api import APIView, validate_serializer
 from .models import Keyword, KeywordGroup, Group, GroupKeyword, GroupSchedule, GroupUser
@@ -153,7 +152,6 @@ def preview(request):
         news_collection = conn[MONGO_DB]['News']
         
         date_query = {'create_dt': {'$gte': from_date, '$lt': to_date}}
-        news_list = {}
         
         reaction_ko = {
             'cheer': '응원해요',
@@ -166,25 +164,36 @@ def preview(request):
         
         nlp_dataset = NLPData(from_date, to_date, keyword_list)
         wordcloud_generator = NLPCloud(nlp_dataset)
-        total_wordcloud = wordcloud_generator.multi_keyword_cloud(keyword_list)
-        keyword_list = [(keyword, keyword.replace(' ','-')) for keyword in keyword_list]
-        for keyword, keyword_without_space in keyword_list:
+        
+        data_by_keyword = {keyword:{'keyword_wo_space': keyword.replace(' ','-')} for keyword in keyword_list}
+        for keyword in keyword_list:
+            # 뉴스 목록 검색
             cursor = news_collection.find(
                 {'$and':[date_query, {'keyword':{'$eq': keyword}}]}, 
                 allow_disk_use=True).sort('reaction_sum', -1).limit(10)
-            news_list[keyword_without_space] = list(cursor)
-            for news_item in news_list[keyword_without_space]:
+            data_by_keyword[keyword]['news_list'] = list(cursor)
+            for news_item in data_by_keyword[keyword]['news_list']:
                 news_item['reaction_ko'] = {
                     reaction_ko[reaction_type]:reaction_value 
                     for reaction_type, reaction_value in news_item['reaction'].items()
                 }
+            # 빈도수 데이터
+            data_by_keyword[keyword]['freq_data'] = wordcloud_generator.single_keyword_cloud(keyword)
+            # 감성 분석 데이터
+            data_by_keyword[keyword]['absa'] = {}
+            for nlp_data in nlp_dataset.data[keyword]:
+                for tag_list in nlp_data['ABSA']:
+                    for asp_tag_type, asp_tag_text, opn_text in tag_list:
+                        asp_tag_type = asp_tag_type[4:7]
+                        if asp_tag_type not in data_by_keyword[keyword]['absa']:
+                            data_by_keyword[keyword]['absa'][asp_tag_type] = [0, set()]
+                        data_by_keyword[keyword]['absa'][asp_tag_type][0] += 1
+                        data_by_keyword[keyword]['absa'][asp_tag_type][1].add(opn_text)
         values = {
-            'keywords': keyword_list,
             'today': today,
             'from_date': from_date,
             'to_date': to_date,
-            'news_list': news_list,
-            'total_wordcloud': total_wordcloud,
+            'data_by_keyword': data_by_keyword,
             'first_depth' : 'NEWS 클리핑',
             'second_depth': '미리보기',
         }
