@@ -19,6 +19,7 @@ class Youtube(dmodels.Model):
 
 
 class News(dmodels.Model):
+    _id = dmodels.CharField(max_length=100, null=True)
     data_id = dmodels.IntegerField(null=False)
     press = dmodels.CharField(max_length=100, null=False)
     reporter = dmodels.CharField(max_length=100, null=True)
