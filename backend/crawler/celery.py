@@ -32,10 +32,10 @@ app.conf.beat_schedule = {
         "schedule": crontab(minute=0, hour=6),
         "args": ["News"],
     },
-    # "News-schedule-6pm": {
-    #     "task": "schedule_task",
-    #     "schedule": crontab(minute=0, hour=18),
-    #     "args": ["News"],
-    # }
+    "News-schedule-6pm": {
+        "task": "schedule_task",
+        "schedule": crontab(minute=0, hour=18),
+        "args": ["News"],
+    }
     # 다른 크롤러에 대한 스케줄링을 추가하고 싶다면, [News]에 해당하는 부분을 다른 spider의 이름으로 변경하면 됩니다.
 }
