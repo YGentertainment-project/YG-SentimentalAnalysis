@@ -233,7 +233,8 @@ def preview(request):
                             data_by_keyword[keyword]['absa'][asp_tag_type][1][opn_text] = 0
                         data_by_keyword[keyword]['absa'][asp_tag_type][1][opn_text] += 1
             # ASP 태그를 등장 횟수에 따라 내림차순 정렬
-            data_by_keyword[keyword]['absa'] = sorted(data_by_keyword[keyword]['absa'].items(), key=lambda x: x[1][0], reverse=True)
+            data_by_keyword[keyword]['absa'] = \
+                sorted(data_by_keyword[keyword]['absa'].items(), key=lambda x: x[1][0], reverse=True)
         values = {
             'today': today,
             'from_date': from_date,

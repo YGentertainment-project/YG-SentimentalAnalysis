@@ -10,8 +10,10 @@ from wordcloud import WordCloud
 class NLPData:
     def __init__(self, from_date: datetime, to_date: datetime, keywords):
         try:
+            # NLP 데이터 DB 연결
             conn = MongoClient(f'mongodb://{MONGO_USER}:{MONGO_PSWD}@{MONGO_ADDR}:{MONGO_PORT}')
             self.NLP_collection = conn[MONGO_DB]['NewsNLP']
+            # to_date 기간 설정 23:59:59로 변경하여 검색
             to_date = to_date.replace(hour=23, minute=59, second=59)
             cursor = self.NLP_collection.find(
                 {
@@ -23,6 +25,7 @@ class NLPData:
             )
             self.data = {keyword:[] for keyword in keywords}
             for item in cursor:
+                # JSON String 형태로 저장된 데이터 Dictionary로 변환
                 item['NER'] = json.loads(item['NER'])
                 item['POS'] = json.loads(item['POS'])
                 item['ABSA'] = json.loads(item['ABSA'])
@@ -39,10 +42,27 @@ class NLPCloud:
     def single_keyword_cloud(
                   self,
                   keyword, 
-                  length_threshold = 2,
                   pos_tag_filter = ['NNG', 'NNP', 'VV', 'VP'],
-                  ner_tag_filter = ['PER', 'AFW']) -> Dict[str, str]:
-        #POS
+                  ner_tag_filter = ['PER', 'AFW']) -> Dict[str, Dict[str, int]]:
+        '''
+        Method: single_keyword_cloud
+        단일 키워드에 대한 워드 클라우드용 Frequency 데이터 생성기
+        
+        Args:
+            keyword (str): 클라우드 생성 키워드
+            pos_tag_filter (List[str], default=['NNG', 'NNP', 'VV', 'VP']):
+                형태소 필터, 이에 해당하는 태그만 Frequency 측정
+            ner_tag_filter (List[str], default=['PER', 'AFW']):
+                개체명 필터, 이에 해당하는 태그만 Frequency 측정
+        
+        Returns:
+            frequency_data (Dict[str, Dict[str, int]]): 
+                MIX: NER + POS를 합친 데이터
+                NER: 개체명 데이터
+                POS: 형태소 데이터
+                Dict[str, int]: 태그별 Frequency
+        '''
+        # POS
         POS_words = []
         NER_words = []
         for item in self.data[keyword]:
