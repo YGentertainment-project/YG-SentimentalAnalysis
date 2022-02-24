@@ -47,7 +47,6 @@ def base(request):
             '''
             export to excel (mail receiver download)
             '''
-            print("export to excel (mail receiver download)")
             group_id = request.POST.get('group_id', None) #그룹 id
             try:
                 group = Group.objects.filter(id=group_id).first()
@@ -86,7 +85,6 @@ def base(request):
             '''
             export to excel (keyword download)
             '''
-            print("export to excel (keyword download)")
             try:
                 keyword_groups = KeywordGroup.objects.all()
                 keywords = Keyword.objects.all()
@@ -249,34 +247,46 @@ def preview(request):
         traceback.print_exc()
         return JsonResponse(data={"success":False, "data": "Internal Server Error"})
 
+# KeywordAPI
+# Keyword Groups Excel Handling
+# | get: Download Keyword Excel
+# | post: Create/Update Keyword Excel
+# Author: 곽재원, tsfo1489@gmail.com
 class KeywordAPI(APIView):
     def get(self, request):
         '''
-        Keyword list read API
+        Download Keyword Group Excel
+        REQUEST FORMAT: None
+        RESPONSE FORMAT: Excel 
         '''
         try:
+            # 키워드 그룹 및 키워드 종합
             keyword_groups = KeywordGroup.objects.all()
             keywords = Keyword.objects.all()
             if keyword_groups.exists():
+                # { 키워드그룹:List[키워드] }
                 keyword_table = {}
                 for keyword_group in keyword_groups:
                     keyword_table[keyword_group.groupname] = []
                 for keyword in keywords:
                     keyword_table[keyword.keywordgroup.groupname].append(keyword.keyword)
+                # 최대 동의어 개수 카운트
                 max_column = max([len(keywords) for _, keywords in keyword_table.items()])
-                print(keyword_table.items())
                 new_wb = openpyxl.Workbook()
                 new_ws = new_wb.active
+                # 최상단 컬럼명 작성 (키워드, 동의어1, 동의어2, ..., 종류)
                 new_ws.cell(1, 1, '키워드')
                 for col in range(2, max_column + 1):
                     new_ws.cell(1, col, f'동의어{col - 1}')
                 new_ws.cell(1, max_column + 1, '종류')
+                # 키워드 그룹 및 동의어 작성
                 for idx1, keyword_group in enumerate(keyword_groups):
                     groupname = keyword_group.groupname
                     new_ws.cell(idx1 + 2, 1, groupname)
                     for idx2, synonym in enumerate(keyword_table[groupname][1:]):
                         new_ws.cell(idx1 + 2, idx2 + 2, synonym)
                     new_ws.cell(idx1 + 2, max_column + 1, keyword_group.type)
+                # Excel 파일 Response 생성
                 filename = 'Keyword.xlsx'
                 file_response = HttpResponse(
                     save_virtual_workbook(new_wb),
@@ -413,7 +423,6 @@ class ClippingGroupAPI(APIView):
         }
         '''
         data = request.POST
-        print(data)
         create_user_flag = False
 
         # 'not in data' means 'in FILES', so there is an attached file
@@ -471,7 +480,6 @@ class ClippingGroupAPI(APIView):
                     # Excel Format should be name, email, name, email...
                     user_tuple = []
                     for cell in row:
-                        print(cell.value)
                         # [[name, email], [name, email], ...]
                         user_tuple.append(cell.value)
                     user_list.append(user_tuple)
