@@ -5,7 +5,7 @@ from scrapy import spiderloader
 from scrapy.crawler import CrawlerProcess
 from scrapy.settings import Settings
 from billiard.context import Process
-from datetime import datetime
+from datetime import datetime, timedelta
 from utils.shortcuts import get_env
 from crawler.NLP_engine import NLP
 
@@ -32,7 +32,9 @@ def nlpanalysis(from_date, to_date):
 @app.task(name="schedule_task", bind=True)
 def schedule_task(self, spider_name):
     current_time = datetime.now()
-    from_date = to_date = current_time.strftime("%Y%m%d")
+    from_date = current_time - timedelta(days=1)
+    from_date = from_date.strftime("%Y%m%d")
+    to_date = current_time.strftime("%Y%m%d")
     # print(from_date, to_date)
     try:
         crawl_process = Process(target=crawling, args=[spider_name, from_date, to_date])
