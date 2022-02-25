@@ -353,7 +353,7 @@ $("#save-group").click(function(){
             schedules_list.push(getTime($($('.schedule-hour')[i]).val(), $($('.schedule-minute')[i]).val()));
 		}
 	}
-    if(collect_date==undefined && keywords_list.length == 0){
+    if(collect_date==undefined || keywords_list.length == 0){
         alert("모든 값을 입력해주세요.");
         return;
     }
