@@ -40,7 +40,7 @@ services:
             - yg-as-mariadb
             - yg-as-mongodb          
         ports:
-            - "0.0.0.0:80:8000"
+            - "0.0.0.0:8082:8000"
         command: >
             sh -c "python3 manage.py makemigrations &&
                    python3 manage.py migrate &&
@@ -53,8 +53,7 @@ services:
             - RABBITMQ_USER=ygenter
             - RABBITMQ_PASSWORD=ygenter
         ports:
-            - "5672:5672"
-            - "15672:15672"
+            - "5673:5673"
 
     yg-celery-worker-beat:
         image: sentimental-analysis
