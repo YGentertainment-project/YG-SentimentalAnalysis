@@ -7,7 +7,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "yg.settings")
 
 production_env = get_env("YG_ENV", "dev") == "production"
 if production_env:
-    app = Celery("crawler", backend="rpc://", broker="amqp://guest:guest@yg-rabbitmq:5672/")
+    app = Celery("crawler", backend="rpc://", broker="amqp://guest:guest@yg-as-rabbitmq:5672/")
 else:
     app = Celery("crawler", backend="rpc://", broker="amqp://guest:guest@localhost:5672/")
 
