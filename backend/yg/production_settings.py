@@ -8,20 +8,20 @@ DATABASE_ROUTERS = [
 ]
 
 DATABASES = {
-    "default":{
-        "ENGINE": "django.db.backends.mysql",
-        "HOST": "yg-mariadb",
-        "PORT": 3306,
-        "NAME": "ygenter",
-        "USER": "ygenter",
-        "PASSWORD": "ygenter",
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': "ygenter",
+        'USER': "ygenter",
+        'PASSWORD': "ygenter",
+        'HOST': "yg-as-mariadb",
+        'PORT': 3306,
     },
-    "mongo":{
+    "mongo": {
         "ENGINE": "djongo",
         # "ENFORCE_SCHEMA": True,
-        "NAME": "ygenter",
+        "NAME": "yg-mongodb",
         "CLIENT": {
-            "host": "yg-mongodb",
+            "host": "yg-as-mongodb",
             "port": 27017,
             "username": "ygenter",
             "password": "ygenter",

@@ -20,6 +20,7 @@ function format(d){
 }
 
 $(document).ready(function(){
+    // create datatables
     var dt = $('#dataTable').DataTable({
         serverSide: true,
         ajax: {
@@ -93,6 +94,7 @@ $(document).ready(function(){
         var searchTitle = $("#searchTitle").val();
         var searchKeyword = $("#searchKeyword").val();
 
+        // datatables search API
         dt.columns(0).search(searchTitle);
         dt.columns(1).search(searchKeyword);
         if($("#searchDateFrom").val()!=""&&$("#searchDateTo").val()!="") dt.columns(2).search(searchDate);

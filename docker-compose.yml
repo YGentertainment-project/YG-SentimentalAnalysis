@@ -1,23 +1,23 @@
 version: "3.8"
 
 services:
-    yg-mariadb:
+    yg-as-mariadb:
         image: mariadb:10.7.1
-        container_name: yg-mariadb
+        container_name: yg-as-mariadb
         restart: always
         volumes:
             - ./db/data/maria:/var/lib/mysql
         environment:
-            - MYSQL_HOST=yg-mariadb
+            - MYSQL_HOST=yg-as-mariadb
             - MYSQL_PORT=3306
             - MYSQL_ROOT_PASSWORD=ygenter
             - MYSQL_DATABASE=ygenter
             - MYSQL_USER=ygenter
             - MYSQL_PASSWORD=ygenter
         
-    yg-mongodb:
+    yg-as-mongodb:
         image: mongo:5.0.5
-        container_name: yg-mongodb
+        container_name: yg-as-mongodb
         restart: always
         volumes:
             - ./db/data/mongo:/data/db
@@ -30,15 +30,15 @@ services:
     yg-sentimental-analysis:
         image: sentimental-analysis
         container_name: yg-sentimental-analysis
-#        deploy:
-#            resources:
-#                reservations:
-#                    devices:
-#                        - capabilities: [gpu]
+        deploy:
+            resources:
+                reservations:
+                    devices:
+                        - capabilities: [gpu]
         restart: always
         depends_on:
-            - yg-mariadb
-            - yg-mongodb          
+            - yg-as-mariadb
+            - yg-as-mongodb          
         ports:
             - "0.0.0.0:8082:8000"
         command: >
@@ -46,16 +46,14 @@ services:
                    python3 manage.py migrate &&
                    python3 manage.py runserver 0.0.0.0:8000 --insecure"
 
-#                   python3 manage.py migrate mongo &&
-    yg-rabbitmq:
+    yg-as-rabbitmq:
         image: rabbitmq:3.7.14-management-alpine
-        container_name: yg-rabbitmq
+        container_name: yg-as-rabbitmq
         environment:
             - RABBITMQ_USER=ygenter
             - RABBITMQ_PASSWORD=ygenter
         ports:
-            - "5672:5672"
-            - "15672:15672"
+            - "5673:5673"
 
     yg-celery-worker-beat:
         image: sentimental-analysis
@@ -63,7 +61,7 @@ services:
         command: celery -A crawler worker --beat -c 6 -l info
         ports: [ ]
         links:
-            - yg-rabbitmq
+            - yg-as-rabbitmq
         depends_on:
-            - yg-rabbitmq
-            - yg-mariadb
+            - yg-as-rabbitmq
+            - yg-as-mariadb
