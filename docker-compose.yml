@@ -65,4 +65,4 @@ services:
             - yg-as-rabbitmq
         depends_on:
             - yg-as-rabbitmq
-            - yg-mariadb
+            - yg-as-mariadb
