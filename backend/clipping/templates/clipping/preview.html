@@ -86,7 +86,7 @@
                   aria-controls="nav-wc-ner-{{data.keyword_wo_space}}-table" aria-selected="true">개체명</a>
               </div>
             </nav>
-            <div class="tab-content mb-2 d-flex justify-content-center" style="overflow-y: auto; height: 300px;">
+            <div class="tab-content mb-2 d-flex justify-content-center" style="overflow-y: auto; height: 350px;">
               <div id="nav-wc-mix-{{data.keyword_wo_space}}" class="tab-pane fade wc-tab active show" aria-labelledby="nav-wc-mix-tab" role="tabpanel" wc-data="{{data.freq_data.MIX|safe}}">
               </div>
               <div id="nav-wc-ner-{{data.keyword_wo_space}}" class="tab-pane fade wc-tab" aria-labelledby="nav-wc-ner-tab" role="tabpanel" wc-data="{{data.freq_data.NER|safe}}">
@@ -113,15 +113,15 @@
               </div>
             </div>
           </div>
-          <div class="col-6" style="overflow-y: auto; height: 300px;">
+          <div class="col-6">
             <span class="mb-2" style="font-size: 16px; font-weight: bold;">감성분석</span>
-            <div class="table-responsive">
+            <div class="table-responsive" style="overflow-y: auto; height: 350px;">
               <table class="table table-centered table-nowrap rounded">
                 <thead class="thead-light">
                   <tr>
-                    <th>Aspect</th>
-                    <th>#</th>
-                    <th>Opinion</th>
+                    <th style="font-size: 14px;">Aspect</th>
+                    <th style="font-size: 14px;">#</th>
+                    <th style="font-size: 14px;">Opinion</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -129,7 +129,7 @@
                   <tr>
                     <td>{{aspect}}</td>
                     <td>{{opn_list.0}}</td>
-                    <td>
+                    <td style="white-space: normal;">
                       {% for opn, opn_cnt in opn_list.1.items %}
                       {% if forloop.first %}
                       "{{opn}}"
