@@ -132,9 +132,9 @@
                     <td style="white-space: normal;">
                       {% for opn, opn_cnt in opn_list.1.items %}
                       {% if forloop.first %}
-                      "{{opn}}"
+                      {{opn}}({{opn_cnt}})
                       {% else %}
-                      , "{{opn}}"
+                      , {{opn}}({{opn_cnt}})
                       {% endif %}
                       {% endfor %}
                     </td>
