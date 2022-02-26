@@ -141,21 +141,6 @@ svg .add-circle{
     cursor: pointer;
 }
 
-svg g {
-    stroke: #666666;
-    fill: white;
-}
-  
-svg:hover g {
-    stroke: white;
-    fill: #666666;
-}
-  
-svg:active g {
-    stroke: #666666;
-    fill: white;
-}
-
 .add-group-form{
     width: 40% !important;
     padding-top: 20px;
