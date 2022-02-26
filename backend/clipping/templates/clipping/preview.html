@@ -130,7 +130,7 @@
                     <td>{{aspect}}</td>
                     <td>{{opn_list.0}}</td>
                     <td style="white-space: normal;">
-                      {% for opn, opn_cnt in opn_list.1.items %}
+                      {% for opn, opn_cnt in opn_list.1 %}
                       {% if forloop.first %}
                       {{opn}}({{opn_cnt}})
                       {% else %}
