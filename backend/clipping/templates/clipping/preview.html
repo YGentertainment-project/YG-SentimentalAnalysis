@@ -51,6 +51,8 @@
                     <br>
                     <span style="font-size: 14px;">{{news.press}} {{news.reporter}}기자</span>
                     <br>
+                    <span style="font-size: 14px;">{{news.create_dt|date:'Y년 m월 d일'}}</span>
+                    <br>
                     <span class="text-black-50" style="font-size: 14px;">
                       {% for reaction_type, reaction_cnt in news.reaction_ko.items %}
                         {{reaction_type}}: {{reaction_cnt}}
