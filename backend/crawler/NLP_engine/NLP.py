@@ -20,9 +20,9 @@ from pymongo.errors import DuplicateKeyError
 from transformers import AutoModelForTokenClassification
 from torch.utils.data import TensorDataset, DataLoader, SequentialSampler
 
-MONGO_ADDR='150.230.34.147'
+MONGO_ADDR='yg-as-mongodb'
 MONGO_PORT=27017
-MONGO_DB='crawling_tuto'
+MONGO_DB='ygenter'
 MONGO_USER='ygenter'
 MONGO_PSWD='ygenter'
 
