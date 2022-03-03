@@ -19,7 +19,11 @@ from pymongo.errors import DuplicateKeyError
 from transformers import AutoModelForTokenClassification
 from torch.utils.data import TensorDataset, DataLoader, SequentialSampler
 
-from crawler.scrapy_app.apikey import MONGO_ADDR, MONGO_DB, MONGO_PORT, MONGO_PSWD, MONGO_USER
+MONGO_ADDR='150.230.34.147'
+MONGO_PORT=27017
+MONGO_DB='crawling_tuto'
+MONGO_USER='ygenter'
+MONGO_PSWD='ygenter'
 
 VOCAB_FILES_NAMES = {"vocab_file": "tokenizer_78b3253a26.model",
                      "vocab_txt": "vocab.txt"}
@@ -462,8 +466,8 @@ class NLP_Engine:
         tokenizer (BertTokenizer): Bert Tokenizer for ner, absa model
     '''
     def __init__(self,
-                 ner_model_path='clipping/NLP_engine/ner_model',
-                 absa_model_path='clipping/NLP_engine/absa_model',
+                 ner_model_path='crawler/NLP_engine/ner_model',
+                 absa_model_path='crawler/NLP_engine/absa_model',
                  device="cuda" if torch.cuda.is_available() else "cpu"
                 ) -> None:
         '''
