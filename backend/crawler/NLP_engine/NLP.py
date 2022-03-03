@@ -9,6 +9,7 @@ import numpy as np
 
 from jamo import j2h
 from tqdm import tqdm
+from pororo import Pororo
 from shutil import copyfile
 from konlpy.tag import Mecab
 from datetime import datetime
@@ -482,6 +483,7 @@ class NLP_Engine:
         self.ner_model_path = ner_model_path
         self.absa_model_path = absa_model_path
         self.pos_model = Mecab()
+        self.dp_model = Pororo('dp', 'ko')
         self.device = device
         self.tokenizer = BertTokenizer.from_pretrained('monologg/kobert')
         self.load_ner_model()
